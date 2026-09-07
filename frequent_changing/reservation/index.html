@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<!-- saved from url=(0041)https://picnorder.com/reservation/cantina -->
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><!-- Required meta tags -->
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta property="og:type" content="article">
+<meta property="og:title" content="">
+<meta property="og:description" content="">
+<meta property="og:url" content="">
+<link rel="stylesheet" href="css/bootstrap.min.css">
+<link rel="stylesheet" href="css/datetime.css">
+<link rel="stylesheet" href="css/loader.css">
+<link rel="stylesheet" href="css/frontend.css">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/responsive.css">
+<script src="js/jquery-3.4.1.min.js"></script>
+<script src="js/jquery-ui.main.js"></script>
+</head>
+
+<body class="light" data-aos-easing="ease" data-aos-duration="1000" data-aos-delay="800" data-new-gr-c-s-check-loaded="14.1057.0" data-gr-ext-installed="">
+
+			<div id="preloader" style="display: none;">
+				<div class="preloader_3 loader_position"><span></span>
+    	<span></span></div>
+
+			</div>
+
+
+<section class="sectionDefault">
+<section class="user_home_banner img" data-src="https://picnorder.com/uploads/site_banners/983289a0c8039a48747006fb7bb15055.jpeg" style="background: url(&quot;https://picnorder.com/uploads/site_banners/983289a0c8039a48747006fb7bb15055.jpeg&quot;);">
+  <div class="container">
+    <div class="single_banner">
+      <img src="img/883b735fee070f523e8730243aec4768.jpeg" alt="">
+      <div class="userbanner_right">
+        <div class="userbanner_top">
+          <h4>Cantina Rooftop</h4>
+          <p>cantina</p>
+        </div>
+        <div class="userbanner_bottpm">
+                       <p class="address"><i class="icofont-google-map"></i> <a href="https://www.google.com/maps?q=cantina+rooftop&amp;um=1&amp;ie=UTF-8&amp;sa=X&amp;ved=2ahUKEwip3rzw7J32AhVxj4kEHRCbBTwQ_AUoAnoECAIQBA">605 W 48th St, New York, NY 10019</a></p>
+                      <div class="social_icon_section">
+             <div class="home_social list style_1">
+               <ul>
+
+                                 <li><a href="tel:+12013005189"><i class="fas fa-phone fa-flip-horizontal phone"></i>+1  2013005189 </a></li>
+
+
+                                 <li><a href="mailto:cantina@cantina.com"><i class="fas fa-envelope email"></i> cantina@cantina.com</a></li>
+                               </ul>
+             </div>
+           </div><!--social_icon_section-->
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+
+	<div class="section_items">
+		<div class="container">
+			<div class="contact_content">
+				<div class="sction_title">
+                  <h4 class="section_heading">Reservation</h4>
+                                  </div>
+				<div class="row">
+					<div class="col-md-8">
+
+						<form action="https://picnorder.com/profile/add_reservation" method="post" autocomplete="off" class="defaultForm form-submit">
+							 <!-- csrf token -->
+							   <input type="hidden" name="csrf_test_name" value="f825cb67df00633657125f81ed6b62a7">							<div class="reservation_form">
+								<div class="row">
+									<div class="form-group col-md-12">
+										<label for="">Name <span class="error">*</span></label>
+										<input type="text" name="name" class="form-control">
+									</div>
+								</div>
+
+								<div class="row">
+									<div class="form-group col-md-6 pr-5">
+										<label for="">Email</label>
+										<input type="text" name="email" class="form-control">
+									</div>
+
+									<div class="form-group col-md-6 pl-5">
+										<label for="">Phone <span class="error">*</span></label>
+										<input type="text" name="phone" class="form-control">
+									</div>
+								</div>
+
+								<div class="row">
+									<div class="form-group col-md-6 pr-5">
+										<label for="">number of guest <span class="error">*</span></label>
+										<input type="number" name="total_guest" class="form-control">
+									</div>
+
+									<div class="form-group col-md-6 pl-5">
+										<label for="">Table Reservation <span class="error">*</span></label>
+										<select name="is_table" id="is_table" class="form-control">
+											<option value="">Select</option>
+											<option value="1">yes</option>
+											<option value="0">no</option>
+										</select>
+									</div>
+
+									
+								</div>
+								<div class="row">
+									<div class="form-group col-md-6 pr-5">
+										<label for="">reservation date <span class="error">*</span></label>
+										<div class="input-group date flatpickr" id="datetimepicker1" data-target-input="nearest">
+											<input type="text" name="reservation_date" class="form-control datetimepicker flatpickr-input" data-target="#datetimepicker1" data-input="" readonly="readonly">
+											<div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
+												<div class="input-group-text"><i class="fa fa-calendar"></i></div>
+											</div>
+										</div>
+									</div>
+									<div class="form-group col-md-6 pl-5">
+										<label for="">reservation type <span class="error">*</span></label>
+										<select name="reservation_type" class="form-control">
+											<option value="">Select</option>
+																							<option value="3">Regular Booking</option>
+																							<option value="4">Dinner Booking</option>
+																							<option value="5">Birthday Dinner</option>
+																							<option value="6">Birthday Party</option>
+																					</select>
+									</div>
+
+									<div class="form-group col-md-12">
+										<label for="">Any Special Request?</label>
+										<textarea name="comments" id="comments" class="form-control" cols="5" rows="5"></textarea>
+									</div>
+								</div>
+
+								<div class="row">
+									<div class="form-group col-md-12 text-right">
+										<input type="hidden" name="shop_id" value="MQ==">
+										<button type="submit" class="btn btn-primary custom_btn">Submit</button>
+									</div>
+								</div>
+							</div>
+						<span class="ajax_submit" style="display: none;"></span></form>
+					</div>
+					<div class="col-md-4">
+						<div class="available_days">
+							<div class="appointment_schedule_area mt-10">
+								<p class="ap_info"><i class="fa fa-info-circle"></i> Before booking an reservation please check our availability</p>
+																<ul class="appointment_dates">
+																			
+										<li class="available">
+											<i class="fa fa-check"></i> 
+											<span>Sunday</span> 
+											<b>( 10:00 am - 10:00 am )</b>
+									</li>
+
+																			
+										<li class="available">
+											<i class="fa fa-check"></i> 
+											<span>Monday</span> 
+											<b>( 01:00 am - 11:00 pm )</b>
+									</li>
+
+																			
+										<li class="available">
+											<i class="fa fa-check"></i> 
+											<span>Tuesday</span> 
+											<b>( 10:00 am - 10:00 am )</b>
+									</li>
+
+																			
+										<li class="available">
+											<i class="fa fa-check"></i> 
+											<span>Wednesday</span> 
+											<b>( 10:00 am - 10:00 am )</b>
+									</li>
+
+																			
+										<li class="available">
+											<i class="fa fa-check"></i> 
+											<span>Thursday</span> 
+											<b>( 10:00 am - 10:00 am )</b>
+									</li>
+
+																			
+										<li class="available">
+											<i class="fa fa-check"></i> 
+											<span>Friday</span> 
+											<b>( 01:00 am - 12:00 am )</b>
+									</li>
+
+																			
+										<li class="available">
+											<i class="fa fa-check"></i> 
+											<span>Saturday</span> 
+											<b>( 10:00 am - 10:00 am )</b>
+									</li>
+
+																	</ul>
+								
+							</div>
+						</div>	
+					</div>
+					
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+	<div class="footer_area">
+  <div class="top_footer">
+    <div class="container">
+      <div class="row">
+
+        <div class=" col-lg-4 col-sm-4 col-xs-12">
+          <div class="left_footer">
+            <div class="qrCode">
+              <img src="img/cantina_1259830148.png" alt="">
+            </div>
+            <h4>Cantina Rooftop</h4>
+
+            <p><a href="mailto:cantina@cantina.com"><i class="icofont-email"></i> &nbsp;cantina@cantina.com</a></p>
+            <ul class="">
+
+                              <li><a href="http:/#"><i class="fa fa-facebook facebook"></i></a></li>
+              
+                              <li><a href="http:/#"><i class="fa fa-instagram instagram"></i></a></li>
+              
+              
+              
+                              <li><a href="https://picnorder.com/reservation/cantina#" class="venobox vbox-item" data-autoplay="true" data-vbtype="video"><i class="fa fa-youtube youtube"></i></a></li>
+                          </ul>
+          </div>
+        </div>
+
+
+
+
+                          <div class="col-6 col-sm-4 col-lg-4 sm-p-5">
+            <div class="left_footer">
+              <h4>Hours</h4>
+              <ul class="row_ul">
+                                                                        <li><a href="javascript:;"><span>Sunday</span>  &nbsp; <span class="timeFormat"><i class="icofont-wall-clock"></i> &nbsp;10:00 am - 10:00 am</span></a></li>
+                                                                                          <li><a href="javascript:;"><span>Monday</span>  &nbsp; <span class="timeFormat"><i class="icofont-wall-clock"></i> &nbsp;01:00 am - 11:00 pm</span></a></li>
+                                                                                          <li><a href="javascript:;"><span>Tuesday</span>  &nbsp; <span class="timeFormat"><i class="icofont-wall-clock"></i> &nbsp;10:00 am - 10:00 am</span></a></li>
+                                                                                          <li><a href="javascript:;"><span>Wednesday</span>  &nbsp; <span class="timeFormat"><i class="icofont-wall-clock"></i> &nbsp;10:00 am - 10:00 am</span></a></li>
+                                                                                          <li><a href="javascript:;"><span>Thursday</span>  &nbsp; <span class="timeFormat"><i class="icofont-wall-clock"></i> &nbsp;10:00 am - 10:00 am</span></a></li>
+                                                                                          <li><a href="javascript:;"><span>Friday</span>  &nbsp; <span class="timeFormat"><i class="icofont-wall-clock"></i> &nbsp;01:00 am - 12:00 am</span></a></li>
+                                                                                          <li><a href="javascript:;"><span>Saturday</span>  &nbsp; <span class="timeFormat"><i class="icofont-wall-clock"></i> &nbsp;10:00 am - 10:00 am</span></a></li>
+                                                </ul>
+            </div>
+          </div>
+        
+        <div class=" col-6 col-sm-4 col-lg-4 sm-p-5">
+          <div class="left_footer">
+            <h4>Links</h4>
+            <ul class="row_ul">
+              <li><a href="https://picnorder.com/cantina"><i class="icofont-simple-right"></i> Home</a></li>
+
+                              <li><a href="https://picnorder.com/reservation/cantina"><i class="icofont-simple-right"></i> Reservation</a></li>
+              
+              <li><a href="https://picnorder.com/about-us/cantina"><i class="icofont-simple-right"></i> about us</a></li>
+
+              <li><a href="https://picnorder.com/track-order/cantina"><i class="icofont-simple-right"></i> track order</a></li>
+              
+              
+                              <li><a href="https://picnorder.com/profile/review/cantina"><i class="icofont-simple-right"></i> Reviews</a></li>
+              
+              <li><a href="https://picnorder.com/login"><i class="icofont-simple-right"></i> login</a></li>
+
+             
+            </ul>
+          </div>
+        </div>
+
+        
+        
+
+
+      </div>
+    </div>
+    
+  </div>
+  <div class="footer_bottom text-center">
+    <p>©  Cantina Rooftop </p>
+  </div>
+</div>
+
+
+    <script src="js/bootstrap.min.js"></script>
+	<script src="js/moment.min.js"></script>
+	<script type="text/javascript" src="js/datetime.js"></script>
+
+		<!-- footer pwa -->
+<div class="add-to" style="display: none;">
+	   <div class="add-to-area">
+	   	<a href="javascript:;" class="pwaClose"><i class="fa fa-close"></i></a>
+	    	<div class="pt-7 pwaContent">
+	    		<img src="img/avatar.png" alt="">
+	    		<div class="pwaDetails">
+	    			 <h4>cantina</h4>
+	    		   <p>https://picnorder.com/cantina</p>
+	    		</div>
+	    	</div>
+	   	 	<button class="add-to-btn btn btn-primary">Add to home screen</button>
+	   </div>
+	</div>
+		<script src="js/plugins.js"></script>
+		<script src="js/auth.js"></script>
+		<script src="js/main.js"></script>
+
+</body></html>

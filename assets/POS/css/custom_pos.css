@@ -1,0 +1,128 @@
+.active_tmp_btn {
+    background-color: #e3f2fd !important;
+}
+
+
+
+.ir_w_50 {
+    width: 50% !important;
+}
+
+.ir_w_m_b_4 {
+    margin-bottom: 5px !important;
+}
+
+@media (max-width: 767px) {
+    .order_table_holder .order_holder .single_order .single_order_column .fa-pencil-alt {
+        font-size: 30px !important;
+    }
+}
+
+@media (max-width: 1301px) and (min-width: 768px) {
+    .order_table_holder .order_holder .single_order .single_order_column .fa-pencil-alt {
+        font-size: 30px !important;
+    }
+}
+
+.logout_btn_online_order_css {
+    color: white;
+    text-decoration: none;
+}
+
+/* Color codes for running orders */
+.running_order_custom[order_type="1"] {
+    /* Dine In - Red */
+    background-color: #ff4d4d !important;
+    border-color: #b33636 !important;
+}
+
+.running_order_custom[order_type="2"] {
+    /* Take Away - Orange */
+    background-color: #ffa500 !important;
+    border-color: #b37400 !important;
+}
+
+.running_order_custom[order_type="3"] {
+    /* Delivery - Green (Uber style) */
+    background-color: #06c167 !important;
+    border-color: #048648 !important;
+}
+
+/* Ensure text and icons inside are white for readability */
+.running_order_custom[order_type="1"] p,
+.running_order_custom[order_type="1"] span,
+.running_order_custom[order_type="1"] i,
+.running_order_custom[order_type="2"] p,
+.running_order_custom[order_type="2"] span,
+.running_order_custom[order_type="2"] i,
+.running_order_custom[order_type="3"] p,
+.running_order_custom[order_type="3"] span,
+.running_order_custom[order_type="3"] i {
+    color: #fff !important;
+}
+
+/* Maintain hover effect */
+.running_order_custom:hover {
+    filter: brightness(90%);
+}
+
+/* Order type buttons when selected */
+.dine_in_button[data-selected="selected"] {
+    background-color: #ff4d4d !important;
+    color: #fff !important;
+}
+
+.take_away_button[data-selected="selected"] {
+    background-color: #ffa500 !important;
+    color: #fff !important;
+}
+
+.delivery_button[data-selected="selected"] {
+    background-color: #06c167 !important;
+    color: #fff !important;
+}
+
+/* Ensure icons inside selected buttons are white */
+.dine_in_button[data-selected="selected"] i,
+.take_away_button[data-selected="selected"] i,
+.delivery_button[data-selected="selected"] i {
+    color: #fff !important;
+}
+
+/* Active mobile navigation tab highlighting */
+.top_header_for_mobile .for-mobile-mode button.active_mobile_tab {
+    background-color: #3c8dbc !important;
+    color: #ffffff !important;
+    border: 2px solid #ffffff !important;
+    box-shadow: 0 0 10px rgba(60, 141, 188, 0.8) !important;
+}
+
+.top_header_for_mobile .for-mobile-mode button.active_mobile_tab span {
+    color: #ffffff !important;
+}
+
+/* Highlight Table section in running orders */
+.running_order_custom span.running_order_table_name {
+    background-color: #ffffff !important;
+    padding: 3px 8px !important;
+    border-radius: 4px !important;
+    display: inline-block !important;
+    margin-bottom: 5px !important;
+    font-size: 13px !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15) !important;
+}
+
+.running_order_custom span.running_order_table_name,
+.running_order_custom span.running_order_table_name strong {
+    color: #d93838 !important;
+    font-weight: 700 !important;
+}
+
+/* Fix for cut-off order number inside running order cards when collapsed */
+.inside_single_order_container {
+    height: 50px !important;
+}
+
+.inside_single_order_container.active {
+    height: 100% !important;
+}

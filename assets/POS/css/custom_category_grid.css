@@ -1,0 +1,599 @@
+/* Hide close button on desktop/tablet by default */
+.mobile-drawer-close-btn {
+    display: none !important;
+}
+
+#category_grid_holder {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+    padding: 15px;
+    width: 100%;
+    height: calc(100vh - 150px);
+    /* Adjust based on header/search bar height */
+    overflow-y: auto;
+}
+
+.category_grid_item {
+    background-color: #8de0ba;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 120px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+}
+
+.category_grid_item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    background-color: #7dd4ab;
+}
+
+.category_grid_item h3 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 800;
+    color: #333;
+}
+
+/* Modal Styles for Product Grid */
+#category_product_modal {
+    display: none;
+    position: fixed;
+    z-index: 1050;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0, 0, 0);
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+#category_product_modal .modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 95%;
+    max-width: 90%;
+    border-radius: 8px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+#category_product_modal .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+}
+
+#category_product_modal .modal-header h2 {
+    margin: 0;
+    font-size: 24px;
+}
+
+#category_product_modal .close {
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#category_product_modal .close:hover,
+#category_product_modal .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#category_product_modal .modal-body {
+    /* Uses existing styles for products, but ensures grid layout */
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
+    gap: 15px !important;
+}
+
+/* Hide original elements */
+/* .category-list, Use !important if needed or specific selector in JS */
+#secondary_item_holder {
+    display: none;
+}
+
+#category_product_modal .single_item img {
+    display: none !important;
+}
+
+#category_product_modal .single_item {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+    background-color: #8de0ba !important;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15) !important;
+    border-radius: 8px !important;
+    transition: transform 0.2s, box-shadow 0.2s !important;
+    width: 100% !important;
+    min-height: 120px !important;
+    justify-content: center !important;
+    display: flex !important;
+    flex-direction: column !important;
+    text-align: center !important;
+}
+
+#category_product_modal .single_item:hover {
+    background-color: #7dd4ab !important;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25) !important;
+    transform: translateY(-3px) !important;
+}
+
+/* Edit products text size and bold it Kavi */
+
+#category_product_modal .single_item .item_name {
+    font-size: 20px !important;
+    font-weight: 800 !important;
+    color: #333 !important;
+    white-space: normal !important;
+    /* Allow wrapping for long names if needed */
+}
+
+#category_product_modal .single_item .item_price {
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    color: #444 !important;
+}
+
+
+/* Adjust layout widths - narrow cart (left), widen categories (right) */
+@media (min-width: 1025px) {
+    #main_part .left_item {
+        width: 45% !important;
+    }
+
+    #main_part .main_right {
+        width: 55% !important;
+    }
+}
+
+/* Global POS Cart Flexbox and Sticky Footer (All screen sizes) */
+#main_part .left_item .main_middle {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+    position: relative !important;
+}
+
+#main_part .left_item .main_middle .main_center {
+    flex: 1 !important;
+    height: auto !important;
+    /* Override the fixed height from style2.css */
+    min-height: 0 !important;
+    overflow-y: auto !important;
+}
+
+#bottom_absolute {
+    position: sticky !important;
+    bottom: 0 !important;
+    background-color: #ffffff !important;
+    z-index: 5 !important;
+    margin-top: auto !important;
+    box-shadow: 0 -3px 10px rgba(0, 0, 0, 0.08) !important;
+    padding-bottom: 10px !important;
+}
+
+/* Responsive Tablet & Mobile overrides (1024px and below) */
+@media (max-width: 1024px) {
+    #main_part .left_item {
+        width: 100% !important;
+    }
+
+    #main_part .main_right {
+        width: 100% !important;
+        display: none;
+    }
+}
+
+/* Ensure category grid uses full available width */
+#category_grid_holder {
+    width: 100% !important;
+}
+
+/* Responsive Tablet Landscape / Smaller screens (max-width: 1200px) */
+@media (max-width: 1200px) {
+    #category_grid_holder {
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 12px !important;
+        padding: 12px !important;
+    }
+
+    .category_grid_item {
+        padding: 15px 10px !important;
+        min-height: 100px !important;
+    }
+
+    .category_grid_item h3 {
+        font-size: 16px !important;
+    }
+
+    #category_product_modal .modal-body {
+        grid-template-columns: repeat(5, 1fr) !important;
+        gap: 12px !important;
+    }
+
+    #category_product_modal .single_item {
+        min-height: 100px !important;
+        padding: 10px 6px !important;
+    }
+
+    #category_product_modal .single_item .item_name {
+        font-size: 15px !important;
+        font-weight: 700 !important;
+        line-height: 1.2 !important;
+    }
+
+    #category_product_modal .single_item .item_price {
+        font-size: 13px !important;
+        font-weight: 700 !important;
+        margin-top: 4px !important;
+    }
+}
+
+/* Responsive Mobile View overrides (max-width: 767px) */
+@media (max-width: 767px) {
+    #main_part .main_right #main_item_holder {
+        height: 100% !important;
+        width: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        overflow: hidden !important;
+    }
+
+    #category_grid_holder {
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 8px !important;
+        padding: 8px !important;
+        height: 100% !important; /* Fill full height of parent drawer */
+        overflow-y: auto !important; /* Enable scrollbar on category grid */
+    }
+
+    .category_grid_item {
+        padding: 8px 6px !important;
+        min-height: 80px !important;
+    }
+
+    .category_grid_item h3 {
+        font-size: 13.5px !important;
+        font-weight: 700 !important;
+        line-height: 1.25 !important;
+    }
+
+    #category_product_modal .modal-body {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px !important;
+        padding: 10px !important;
+    }
+
+    #category_product_modal .single_item {
+        min-height: 90px !important;
+        padding: 8px 4px !important;
+    }
+
+    #category_product_modal .single_item .item_name {
+        font-size: 15px !important;
+        font-weight: 700 !important;
+        line-height: 1.2 !important;
+    }
+
+    #category_product_modal .single_item .item_price {
+        font-size: 12px !important;
+        font-weight: 700 !important;
+        margin-top: 4px !important;
+    }
+}
+
+
+
+/* Increase variation button size - comprehensive targeting */
+.cus_pos_modal .pos__modal__body .separate__radio_field .form__field label,
+.cus_pos_modal .pos__modal__body .separate__radio_field button,
+.cus_pos_modal .pos__modal__body .separate__radio_field .btn,
+.cus_pos_modal .separate__radio_field button,
+.cus_pos_modal .separate__radio_field .btn,
+.separate__radio_field button,
+.separate__radio_field .btn,
+.cus_pos_modal .none_inner_body .cart__item__modal form .separate__radio_field .form__field label,
+.cus_pos_modal .none_inner_body .cart__item__modal form .separate__radio_field button,
+.cus_pos_modal .none_inner_body .cart__item__modal form .separate__radio_field .btn,
+.cart__item__modal .separate__radio_field button,
+.cart__item__modal .separate__radio_field .btn,
+.btn-block {
+    width: 100% !important;
+    height: 100px !important;
+    min-height: 100px !important;
+    padding: 25px 20px !important;
+    font-size: 22px !important;
+    font-weight: 700 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1.3 !important;
+    text-align: center !important;
+    border-radius: 5px !important;
+    cursor: pointer !important;
+    transition: all 0.3s !important;
+}
+
+/* Variation button grid layout */
+.cus_pos_modal .separate__radio_field,
+.cart__item__modal .separate__radio_field {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 15px !important;
+    margin-bottom: 15px !important;
+}
+
+/* Mobile Right-to-Left Slide-in Drawer style for Category/Product list Wrapper (.main_right) */
+@media (max-width: 767px) {
+    #main_part .main_right {
+        position: fixed !important;
+        right: -85% !important;
+        /* Starts fully offscreen to the right */
+        width: 83% !important;
+        /* Covers 83% width of the viewport */
+        height: 86vh !important;
+        /* Full vertical height (100vh) */
+        z-index: 9999 !important;
+        /* Sits on top of other content layers */
+        background-color: #f4f7f6 !important;
+        /* Clean background */
+        transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        /* Hardware-accelerated slide animation */
+        display: flex !important;
+        /* Flex layout to center content vertically */
+        flex-direction: column !important;
+        justify-content: flex-start !important;
+        /* Align content to the top to remove empty top space */
+        overflow: visible !important;
+        /* MUST BE VISIBLE so close button outside left border is displayed */
+        padding-top: 20px !important;
+        /* Standard padding since close button is now outside drawer */
+        padding-bottom: 30px !important;
+        box-shadow: -10px 0 30px rgba(0, 0, 0, 0.3) !important;
+        /* Stronger shadow on the left edge */
+    }
+
+    #main_part .main_right.active {
+        right: 0 !important;
+        /* Slides into view, aligning to the right edge */
+    }
+
+    /* Hide the search bar and category dropdown button inside the drawer on mobile */
+    #main_part .main_right #search_form {
+        display: none !important;
+    }
+
+    /* Mobile Close Button Style outside drawer left edge */
+    .mobile-drawer-close-btn {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        position: absolute !important;
+        top: 50% !important; /* Centered vertically */
+        left: -50px !important;
+        transform: translateY(-50%) !important; /* Centered vertically offset */
+        /* Position it outside the left edge of the drawer */
+        width: 38px !important;
+        height: 38px !important;
+        border-radius: 50% !important;
+        background-color: #e35f5f !important;
+        /* Premium red delete/close color */
+        border: 2px solid #ffffff !important;
+        color: #ffffff !important;
+        font-size: 18px !important;
+        z-index: 10002 !important;
+        cursor: pointer !important;
+        box-shadow: -4px 4px 10px rgba(0, 0, 0, 0.4) !important;
+        /* Shadow shifted left */
+        transition: all 0.2s ease !important;
+
+        /* Hide it by default when drawer is closed */
+        opacity: 0 !important;
+        pointer-events: none !important;
+    }
+
+    /* Show it only when the drawer is active */
+    #main_part .main_right.active .mobile-drawer-close-btn {
+        opacity: 1 !important;
+        pointer-events: auto !important;
+    }
+
+    .mobile-drawer-close-btn:hover {
+        background-color: #c94444 !important;
+        transform: translateY(-50%) scale(1.05) !important;
+    }
+}
+
+/* ========================================================
+   Tablet View Overrides (Centered Popup Modal)
+   (Screen widths from 768px to 1024px)
+   ======================================================== */
+@media (min-width: 768px) and (max-width: 1024px) {
+    /* Style main_right as a centered popup modal */
+    #main_part .main_right {
+        position: fixed !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        width: 90% !important;
+        max-width: 800px !important;
+        max-height: 80vh !important;
+        height: auto !important;
+        z-index: 1050 !important;
+        background-color: #000000 !important; /* solid black background matching variant modal */
+        border: 1px solid #f09000 !important; /* dark orange border */
+        border-radius: 12px !important;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 1) !important;
+        color: #fefefe !important;
+        display: flex !important;
+        flex-direction: column !important;
+        overflow: hidden !important;
+        padding: 0 !important;
+    }
+
+    /* Ensure standard modals and overlays sit on top of the Category Wrapper popup */
+    .modal,
+    #category_product_modal {
+        z-index: 2000 !important;
+    }
+    .pos__modal__overlay {
+        z-index: 1999 !important;
+    }
+
+    /* Dimmed backdrop when main_right is open (i.e. cart is hidden) */
+    #main_part:has(.left_item .main_middle[style*="display: none"])::before,
+    #main_part:has(.left_item .main_middle[style*="display:none"])::before {
+        content: "" !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        background-color: rgba(15, 23, 42, 0.45) !important;
+        backdrop-filter: blur(8px) !important;
+        z-index: 1040 !important;
+        pointer-events: auto !important;
+    }
+
+    /* Hide the popup modal entirely when the cart main_middle is visible */
+    #main_part:not(:has(.left_item .main_middle[style*="display: none"])):not(:has(.left_item .main_middle[style*="display:none"])) .main_right {
+        display: none !important;
+    }
+
+    /* Style the header form */
+    #main_part .main_right #search_form {
+        display: flex !important;
+        width: 100% !important;
+        background: #111111 !important;
+        border-bottom: 2px solid #f09000 !important; /* orange underline */
+        padding: 20px 25px !important;
+        margin: 0 !important;
+        box-sizing: border-box !important;
+        position: relative !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+    }
+
+    /* Header title */
+    #main_part .main_right #search_form::before {
+        content: "Categories" !important;
+        color: #f09000 !important;
+        font-weight: 700 !important;
+        font-size: 22px !important;
+        text-transform: uppercase !important;
+        margin-right: 20px !important;
+    }
+
+    /* Header search input */
+    #main_part .main_right #search_form #search {
+        background-color: #222222 !important;
+        border: 1px solid #444 !important;
+        color: #ffffff !important;
+        border-radius: 6px !important;
+        padding: 8px 12px !important;
+        font-size: 14px !important;
+        width: 250px !important;
+        margin: 0 !important;
+    }
+
+    /* Hide the category dropdown button on tablet since category cards are shown directly */
+    #main_part .main_right #search_form .cat-list-wrapper {
+        display: none !important;
+    }
+
+    /* Close (X) button style & position inside header */
+    #main_part .main_right .mobile-drawer-close-btn {
+        display: block !important;
+        position: absolute !important;
+        top: 20px !important;
+        right: 25px !important;
+        left: auto !important;
+        bottom: auto !important;
+        transform: none !important;
+        background: transparent !important;
+        border: none !important;
+        color: #fefefe !important;
+        font-size: 24px !important;
+        z-index: 1060 !important;
+        cursor: pointer !important;
+        opacity: 0.8 !important;
+        transition: all 0.2s ease !important;
+        box-shadow: none !important;
+        width: auto !important;
+        height: auto !important;
+        border-radius: 0 !important;
+    }
+
+    #main_part .main_right .mobile-drawer-close-btn:hover {
+        opacity: 1 !important;
+        color: #f09000 !important;
+        background: transparent !important;
+        transform: scale(1.1) !important;
+    }
+
+    /* Main item holder inside popup */
+    #main_part .main_right #main_item_holder {
+        background-color: #000000 !important;
+        padding: 25px !important;
+        overflow-y: auto !important;
+        height: auto !important;
+        max-height: 65vh !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Grid layout for categories in the popup */
+    #main_part .main_right #category_grid_holder {
+        display: grid !important;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)) !important;
+        gap: 15px !important;
+        padding: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+        overflow-y: visible !important;
+    }
+
+    #main_part .main_right .category_grid_item {
+        background-color: #8de0ba !important;
+        border: 1px solid #7dd4ab !important;
+        border-radius: 10px !important;
+        padding: 20px 15px !important;
+        min-height: 100px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3) !important;
+        transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s !important;
+    }
+
+    #main_part .main_right .category_grid_item:hover {
+        transform: translateY(-3px) !important;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5) !important;
+        background-color: #7dd4ab !important;
+    }
+
+    #main_part .main_right .category_grid_item h3 {
+        color: #333333 !important;
+        font-size: 16px !important;
+        font-weight: 800 !important;
+        margin: 0 !important;
+        text-align: center !important;
+    }
+}

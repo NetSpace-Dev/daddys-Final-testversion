@@ -1,0 +1,14 @@
+*.zip
+_temp/
+*.log
+.DS_Store
+thumbs.db
+
+# Backup / Copy / Old files
+*copy*
+*Copy*
+*-old.php
+
+# Local debug/temp files
+print_server/COM2
+.well-known/
