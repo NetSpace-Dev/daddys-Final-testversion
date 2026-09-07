@@ -8059,12 +8059,19 @@
         }
     );
     $(document).on("click", "#decrease_item_modal", function (e) {
+        let item_id = $("#modal_item_id").html();
+        let original_qty = Number($("#p_qty_" + item_id).val() || 0);
         //get recent item price
         let current_item_price_modal = parseFloat(
             $("#modal_item_price").html()
         ).toFixed(ir_precision);
         //get current item quantity
         let current_item_quantity = Number($("#item_quantity_modal").val());
+
+        if (original_qty > 0 && current_item_quantity <= original_qty) {
+            toastr['error']("You do not have permission to decrease or delete this item!", '');
+            return false;
+        }
 
         //decrease quantity if greater than 1
         if (current_item_quantity > 1) current_item_quantity--;
@@ -8230,6 +8237,11 @@
 
             //get item/menu quantity from modal
             let item_quantity = $("#item_quantity_modal").val();
+            let original_qty_modal = Number($("#p_qty_" + item_id).val() || 0);
+            if (original_qty_modal > 0 && Number(item_quantity) < original_qty_modal) {
+                toastr['error']("You cannot decrease quantity below the ordered quantity (" + original_qty_modal + ")!", '');
+                return false;
+            }
 
             //get vat amount for specific item/menu
             let item_vat_amount_for_all_quantity = (
@@ -8786,13 +8798,10 @@
                 toastr['error']((progress_or_done_kitchen), '');
                 return false;
             }
-            let waiter_app_status = $("#waiter_app_status").val();
-            if (waiter_app_status === "Yes") {
-                let original_qty = Number($("#p_qty_" + item_id).val() || 0);
-                if (original_qty > 0 && Number(item_quantity) <= original_qty) {
-                    toastr['error']("You do not have permission to decrease or delete this item!", '');
-                    return false;
-                }
+            let original_qty = Number($("#p_qty_" + item_id).val() || 0);
+            if (original_qty > 0 && Number(item_quantity) <= original_qty) {
+                toastr['error']("You do not have permission to decrease or delete this item!", '');
+                return false;
             }
             //decrease item quantity if greater then 1 or remove full item from table
             if (item_quantity > 1) {
@@ -17428,12 +17437,10 @@
             toastr['error']((this_item_already_cooked_please_contact_with_admin), '');
             return false;
         } else {
-            if (waiter_app_status === "Yes") {
-                let original_qty = Number($("#p_qty_" + id).val() || 0);
-                if (original_qty > 0) {
-                    toastr['error']("You do not have permission to delete this item!", '');
-                    return false;
-                }
+            let original_qty = Number($("#p_qty_" + id).val() || 0);
+            if (original_qty > 0) {
+                toastr['error']("You do not have permission to delete this item!", '');
+                return false;
             }
             let pos_7 = Number($("#pos_7").val());
             let is_self_order = $("#is_self_order").val();

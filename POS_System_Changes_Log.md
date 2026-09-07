@@ -120,3 +120,16 @@ This document lists all modifications, additions, and optimizations made to the 
   - **File**: `C:\laragon\www\daddys\application\controllers\Sale.php`
   - **Details**: Shared hostings typically limit PHP execution memory to 128MB. Due to the high volume of menus, customer data, and items loaded into the cashier terminal screen, this limit can easily be breached.
   - **Solution**: Added `ini_set('memory_limit', '512M')` at the beginning of the `POS()` method inside `Sale.php` to dynamically increase the memory ceiling for the POS cashier terminal interface.
+
+---
+
+## 7. Order Item Decrease & Delete Protection for Cashier Terminal (ඇණවුම් කළ භාණ්ඩ අඩු කිරීම/මැකීම වැළැක්වීම)
+
+- **Global Protection Logic**:
+  - **File**: `frequent_changing/js/pos_script_v7.1.1.js`
+  - **Details**: Previously, only the Waiter App had restrictions preventing items already sent to the kitchen from being decreased or deleted. Non-waiter Cashier users were able to decrease quantities or delete placed items during "Modify Order".
+  - **Solution**: 
+    1. Extended the `p_qty` (previous quantity) check in `.decrease_item_table` to all users so quantities cannot be reduced below the already ordered count.
+    2. Enforced protection in `.removeCartItem` to block deleting any item where `original_qty > 0`.
+    3. Added `original_qty` checks to the modal quantity decrease button (`#decrease_item_modal`) and manual input validation (`#add_to_cart`).
+    4. Adding new items or increasing quantities (e.g. from 1 to 2) remains fully supported, and new items added in the current session can still be removed before submission.
