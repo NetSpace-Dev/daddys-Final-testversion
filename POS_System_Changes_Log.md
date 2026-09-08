@@ -133,3 +133,23 @@ This document lists all modifications, additions, and optimizations made to the 
     2. Enforced protection in `.removeCartItem` to block deleting any item where `original_qty > 0`.
     3. Added `original_qty` checks to the modal quantity decrease button (`#decrease_item_modal`) and manual input validation (`#add_to_cart`).
     4. Adding new items or increasing quantities (e.g. from 1 to 2) remains fully supported, and new items added in the current session can still be removed before submission.
+
+---
+
+## 8. Live Connection Health Indicator, Force Sync & AJAX Resiliency (ජාල තත්ත්ව දර්ශකය සහ ක්ෂණික Sync කිරීම)
+
+- **Live Network Status Badge & Pulse Sync**:
+  - **Files**: `application/views/sale/POS/main_screen.php` & `frequent_changing/js/pos_script_v7.1.1.js`
+  - **Details**: Displays a live connection status pill in the top header (`#network_status_badge`) with states:
+    - 🟢 **Online (<800ms)**: Stable connection with low latency.
+    - 🟡 **Slow (800ms - 3500ms)**: High latency / degraded Wi-Fi.
+    - 🔴 **Offline (>3500ms / Disconnected)**: Reconnecting state.
+  - **Auto-Pulse Reconnect**: Whenever connection restores from offline/slow to online, an immediate background sync pulse (`loadAllTableStates` & `set_new_orders_to_view_for_interval`) is automatically fired.
+
+- **Manual "Force Sync" Floating/Header Button**:
+  - **Button**: `#btn_force_sync`
+  - **Details**: Provides a 1-click trigger to immediately pull fresh table occupancy states and running orders from the server with smooth spin animation and completion toastr.
+
+- **AJAX Timeout & Resiliency**:
+  - **Details**: Set 4.5s timeouts on `Sale/get_new_orders_ajax` and `Sale/getOrderedTable` requests so packet drops on unstable Wi-Fi recover swiftly on the next interval without blocking or freezing the browser.
+

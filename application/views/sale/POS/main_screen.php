@@ -878,6 +878,102 @@ if ($wl) {
             display: none !important;
         }
 
+        /* Live Network Status & Force Sync Button Styles */
+        .net-status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            cursor: pointer;
+            user-select: none;
+        }
+        .net-status-online {
+            background-color: #ecfdf5 !important;
+            color: #059669 !important;
+            border: 1px solid #a7f3d0 !important;
+        }
+        .net-status-slow {
+            background-color: #fffbeb !important;
+            color: #d97706 !important;
+            border: 1px solid #fde68a !important;
+        }
+        .net-status-offline {
+            background-color: #fef2f2 !important;
+            color: #dc2626 !important;
+            border: 1px solid #fecaca !important;
+        }
+        .net-status-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .net-status-online .net-status-dot {
+            background-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25);
+            animation: pulse-green 2s infinite;
+        }
+        .net-status-slow .net-status-dot {
+            background-color: #f59e0b;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25);
+            animation: pulse-yellow 1.5s infinite;
+        }
+        .net-status-offline .net-status-dot {
+            background-color: #ef4444;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.35);
+            animation: pulse-red 1s infinite;
+        }
+        @keyframes pulse-green {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5); }
+            70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+        @keyframes pulse-yellow {
+            0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.5); }
+            70% { box-shadow: 0 0 0 6px rgba(245, 158, 11, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+        }
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6); }
+            70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+        .btn-force-sync {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 14px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: #ffffff !important;
+            border: none;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+        .btn-force-sync:hover {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.4);
+            transform: translateY(-1px);
+        }
+        .btn-force-sync:active {
+            transform: translateY(0);
+        }
+        .sync-spin {
+            animation: spin 0.75s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
         <?php
         if ($waiter_app_status == "Yes"): ?>
 
@@ -1183,6 +1279,19 @@ if ($wl) {
                                     class="header_menu_icon logout_for_user"><i class="fa fa-sign-out"> </i></a>
                             </li>
                         <?php endif; ?>
+                        <li id="network_status_li" style="display: inline-flex; align-items: center; margin-right: 8px;">
+                            <div id="network_status_badge" class="net-status-badge net-status-online" title="Connection: Online & Stable">
+                                <span class="net-status-dot"></span>
+                                <span class="net-status-text">Online</span>
+                                <span class="net-status-latency" style="font-size: 11px; opacity: 0.85; margin-left: 2px;"></span>
+                            </div>
+                        </li>
+                        <li id="force_sync_li" style="display: inline-flex; align-items: center; margin-right: 8px;">
+                            <button id="btn_force_sync" type="button" class="btn-force-sync" title="Force Sync Tables & Orders">
+                                <i class="fal fa-sync-alt" id="sync_icon_spin"></i>
+                                <span>Sync</span>
+                            </button>
+                        </li>
                         <li class="has__children <?php echo escape_output($is_self_order_class) ?>">
                             <a href="#" class="header_menu_icon" data-tippy-content="<?php echo lang('language'); ?>">
                                 <i class="fal fa-globe"></i>
@@ -1423,6 +1532,16 @@ if ($wl) {
                     <button type="button" class="bg__purple fullscreen"
                         data-tippy-content="<?php echo lang('fullscreen_1'); ?>">
                         <i class="fal fa-expand-arrows-alt"></i>
+                    </button>
+
+                    <div class="net-status-badge net-status-online network_status_badge_mobile" title="Connection: Online & Stable" style="margin-left: 6px;">
+                        <span class="net-status-dot"></span>
+                        <span class="net-status-text">Online</span>
+                        <span class="net-status-latency" style="font-size: 11px; opacity: 0.85; margin-left: 2px;"></span>
+                    </div>
+                    <button type="button" class="btn-force-sync btn_force_sync_mobile" title="Force Sync Tables & Orders" style="margin-left: 6px;">
+                        <i class="fal fa-sync-alt"></i>
+                        <span>Sync</span>
                     </button>
                 </div>
                 <?php

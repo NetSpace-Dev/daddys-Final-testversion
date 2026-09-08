@@ -1256,11 +1256,17 @@
     }
 
     function displayServerOrders() {
+        let startTime = Date.now();
         $.ajax({
             url: base_url + "Sale/get_new_orders_ajax",
             method: "GET",
             dataType: "json",
+            timeout: 4500,
             success: function (response) {
+                let latency = Date.now() - startTime;
+                if (typeof updateNetworkStatus === 'function') {
+                    updateNetworkStatus(latency > 2500 ? 'slow' : 'online', latency);
+                }
                 if (!response || response.length === 0) return;
                 console.log("[displayServerOrders] Server orders fetched:", response);
 
@@ -1335,7 +1341,14 @@
                 }
                 loadAllTableStates();
             },
-            error: function () {
+            error: function (xhr, status) {
+                if (typeof updateNetworkStatus === 'function') {
+                    if (status === 'timeout' || !navigator.onLine) {
+                        updateNetworkStatus('offline');
+                    } else {
+                        updateNetworkStatus('slow');
+                    }
+                }
                 // Silently fail — IndexedDB orders already shown
                 loadAllTableStates();
             }
@@ -1469,6 +1482,7 @@
         $.ajax({
             url: base_url + "Sale/getOrderedTable",
             method: "POST",
+            timeout: 4500,
             data: {
                 csrf_irestoraplus: csrf_value_,
             },
@@ -22570,4 +22584,106 @@
         localStorage.setItem('cfd_cart', JSON.stringify(payload));
     }
 
+    // =========================================================================
+    // LIVE NETWORK HEALTH MONITOR & FORCE SYNC HANDLER (Online Domain Resiliency)
+    // =========================================================================
+    let lastNetworkState = 'online';
+
+    function updateNetworkStatus(state, latency) {
+        let $badge = $("#network_status_badge, .network_status_badge_mobile");
+        if ($badge.length === 0) return;
+
+        let prevState = lastNetworkState;
+        lastNetworkState = state;
+
+        $badge.removeClass("net-status-online net-status-slow net-status-offline");
+
+        if (state === 'online') {
+            $badge.addClass("net-status-online");
+            $badge.find(".net-status-text").text("Online");
+            let latText = (typeof latency === 'number' && latency > 0) ? `(${latency}ms)` : '';
+            $badge.find(".net-status-latency").text(latText);
+            $badge.attr("title", "Connection: Online & Stable " + latText);
+
+            if (prevState === 'offline' || prevState === 'slow') {
+                console.log("[NetworkMonitor] Reconnected! Triggering auto-pulse sync...");
+                if (typeof loadAllTableStates === 'function') loadAllTableStates();
+                if (typeof set_new_orders_to_view_for_interval === 'function') set_new_orders_to_view_for_interval();
+            }
+        } else if (state === 'slow') {
+            $badge.addClass("net-status-slow");
+            $badge.find(".net-status-text").text("Slow");
+            let latText = (typeof latency === 'number' && latency > 0) ? `(${latency}ms)` : '';
+            $badge.find(".net-status-latency").text(latText);
+            $badge.attr("title", "Connection: Slow / High Latency " + latText);
+        } else {
+            $badge.addClass("net-status-offline");
+            $badge.find(".net-status-text").text("Offline");
+            $badge.find(".net-status-latency").text("");
+            $badge.attr("title", "Connection: Disconnected / Reconnecting...");
+        }
+    }
+
+    function checkLiveNetworkHealth() {
+        if (!navigator.onLine) {
+            updateNetworkStatus('offline');
+            return;
+        }
+        let pingStart = Date.now();
+        $.ajax({
+            url: base_url + "Sale/get_new_orders_ajax",
+            method: "GET",
+            dataType: "json",
+            timeout: 4000,
+            success: function (res) {
+                let latency = Date.now() - pingStart;
+                if (latency > 2500) {
+                    updateNetworkStatus('slow', latency);
+                } else {
+                    updateNetworkStatus('online', latency);
+                }
+            },
+            error: function (xhr, status) {
+                if (status === 'timeout' || !navigator.onLine) {
+                    updateNetworkStatus('offline');
+                } else {
+                    updateNetworkStatus('slow');
+                }
+            }
+        });
+    }
+
+    window.addEventListener('online', function () {
+        updateNetworkStatus('online');
+        checkLiveNetworkHealth();
+    });
+    window.addEventListener('offline', function () {
+        updateNetworkStatus('offline');
+    });
+
+    setInterval(checkLiveNetworkHealth, 8000);
+    setTimeout(checkLiveNetworkHealth, 1200);
+
+    // Force Sync Click Handler
+    $(document).on("click", "#btn_force_sync, .btn-force-sync", function (e) {
+        e.preventDefault();
+        let $btn = $(this);
+        let $icon = $btn.find("#sync_icon_spin, i");
+        $icon.addClass("sync-spin");
+
+        toastr.options = { positionClass: 'toast-bottom-right', timeOut: 2000 };
+        toastr['info']("Syncing tables and orders...", "Syncing");
+
+        if (typeof loadAllTableStates === 'function') loadAllTableStates();
+        if (typeof displayServerOrders === 'function') displayServerOrders();
+        if (typeof sync_server_orders_to_local_db === 'function') sync_server_orders_to_local_db(true);
+
+        setTimeout(function () {
+            $icon.removeClass("sync-spin");
+            checkLiveNetworkHealth();
+            toastr['success']("Data synced successfully!", "Sync Complete");
+        }, 600);
+    });
+
 })(jQuery);
+
