@@ -1187,6 +1187,188 @@ if ($wl) {
                 font-size: 13px !important;
             }
         }
+
+        /* Custom Header More Options Dropdown */
+        .custom_header_more_li {
+            position: relative;
+        }
+        .custom_header_more_dropdown {
+            width: 220px !important;
+            top: 48px !important;
+            left: auto !important;
+            right: 0 !important;
+            background: #ffffff !important;
+            border-radius: 10px !important;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.18), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+            border: 1px solid rgba(226, 232, 240, 0.9) !important;
+            padding: 6px 0 !important;
+            z-index: 99999 !important;
+        }
+        .custom_header_more_dropdown li {
+            position: relative;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: block !important;
+        }
+        .custom_header_more_dropdown .custom_more_item {
+            display: flex !important;
+            align-items: center !important;
+            padding: 9px 16px !important;
+            color: #334155 !important;
+            font-size: 13.5px !important;
+            font-weight: 500 !important;
+            text-decoration: none !important;
+            transition: all 0.2s ease !important;
+            cursor: pointer;
+            line-height: 1.3 !important;
+        }
+        .custom_header_more_dropdown .custom_more_item i:first-child {
+            width: 20px !important;
+            margin-right: 10px !important;
+            font-size: 15px !important;
+            color: #22bfe9 !important;
+            text-align: center !important;
+        }
+        .custom_header_more_dropdown .custom_more_item:hover {
+            background-color: #f0f9ff !important;
+            color: #0284c7 !important;
+        }
+        .custom_header_more_dropdown .custom_more_item:hover i:first-child {
+            color: #0284c7 !important;
+        }
+        .custom_header_more_dropdown .custom_more_divider {
+            height: 1px !important;
+            background-color: #f1f5f9 !important;
+            margin: 5px 0 !important;
+        }
+        .custom_header_more_dropdown .custom_submenu_chevron {
+            margin-left: auto !important;
+            font-size: 11px !important;
+            color: #94a3b8 !important;
+        }
+        .custom_lang_submenu_parent {
+            position: relative;
+        }
+        .custom_lang_submenu_parent:hover .custom_lang_sub_menu {
+            display: block !important;
+        }
+        .custom_lang_sub_menu {
+            display: none;
+            position: absolute;
+            top: -6px;
+            right: 100%;
+            width: 150px;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.18), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(226, 232, 240, 0.9);
+            padding: 6px 0;
+            list-style: none;
+            z-index: 100000;
+        }
+        .custom_lang_sub_item {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            padding: 8px 14px !important;
+            color: #334155 !important;
+            font-size: 13px !important;
+            font-weight: 500 !important;
+            text-decoration: none !important;
+            transition: all 0.2s ease !important;
+        }
+        .custom_lang_sub_item:hover {
+            background-color: #f0f9ff !important;
+            color: #0284c7 !important;
+        }
+        .custom_lang_sub_menu li.active_lng .custom_lang_sub_item {
+            background-color: #e0f2fe !important;
+            color: #0284c7 !important;
+            font-weight: 600 !important;
+        }
+        .active_check_icon {
+            font-size: 11px !important;
+            color: #0284c7 !important;
+        }
+
+        /* Custom Header Item / Quick Add Dropdown */
+        .custom_header_item_li {
+            position: relative;
+        }
+        .custom_header_item_dropdown {
+            width: 260px !important;
+            max-height: 440px !important;
+            overflow-y: auto !important;
+            top: 48px !important;
+            left: auto !important;
+            right: 0 !important;
+            background: #ffffff !important;
+            border-radius: 10px !important;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.18), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+            border: 1px solid rgba(226, 232, 240, 0.9) !important;
+            padding: 6px 0 !important;
+            z-index: 99999 !important;
+        }
+        .custom_header_item_dropdown::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom_header_item_dropdown::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom_header_item_dropdown::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .custom_header_item_dropdown li {
+            position: relative;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: block !important;
+        }
+        .custom_item_dropdown_title {
+            padding: 8px 16px 6px 16px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #64748b;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #f1f5f9;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .custom_item_dropdown_title i {
+            font-size: 14px;
+            color: #22bfe9;
+        }
+        .custom_header_item_dropdown .custom_item_link {
+            display: flex !important;
+            align-items: center !important;
+            padding: 8px 16px !important;
+            color: #334155 !important;
+            font-size: 13px !important;
+            font-weight: 500 !important;
+            text-decoration: none !important;
+            transition: all 0.2s ease !important;
+            cursor: pointer;
+            line-height: 1.3 !important;
+        }
+        .custom_header_item_dropdown .custom_item_link i {
+            width: 14px !important;
+            margin-right: 8px !important;
+            font-size: 12px !important;
+            color: #94a3b8 !important;
+        }
+        .custom_header_item_dropdown .custom_item_link:hover {
+            background-color: #f0f9ff !important;
+            color: #0284c7 !important;
+        }
+        .custom_header_item_dropdown .custom_item_link:hover i {
+            color: #0284c7 !important;
+        }
     </style>
 </head>
 
@@ -1292,32 +1474,6 @@ if ($wl) {
                                 <span>Sync</span>
                             </button>
                         </li>
-                        <li class="has__children <?php echo escape_output($is_self_order_class) ?>">
-                            <a href="#" class="header_menu_icon" data-tippy-content="<?php echo lang('language'); ?>">
-                                <i class="fal fa-globe"></i>
-                            </a>
-                            <ul class="sub__menu" role="menu">
-                                <?php $language = $this->session->userdata('language');
-                                if (!$language) {
-                                    $language = "english";
-                                }
-                                ?>
-                                <?php
-                                $dir = glob("application/language/*", GLOB_ONLYDIR);
-                                foreach ($dir as $value):
-                                    $separete = explode("language/", $value);
-                                    ?>
-                                    <li class="<?= isset($language) && $language == $separete[1] ? 'active_lng' : '' ?>"><a
-                                            class="action_main_menu"
-                                            data-url="<?php echo base_url(); ?>Authentication/setlanguagePOS/<?= escape_output($separete[1]) ?>"
-                                            href="#"><?php echo escape_output(ucfirstcustom($separete[1])) ?></a>
-                                    </li>
-                                    <?php
-                                endforeach;
-                                ?>
-                            </ul>
-                        </li>
-
                         <li>
                             <a href="#" id="open_hold_sales"
                                 class="header_menu_icon <?php echo escape_output($is_self_order_class) ?>"
@@ -1337,24 +1493,11 @@ if ($wl) {
                                     class="fal fa-history"></i></a>
                         </li>
                         <li>
-                            <a href="#" id="last_ten_feature_button"
-                                class="header_menu_icon <?php echo escape_output($is_self_order_class) ?>"
-                                data-tippy-content="<?php echo lang('feature_sales'); ?>"><i
-                                    class="fas fa-shopping-bag"></i></a>
-                        </li>
-                        <li>
                             <a href="#"
                                 class="last_ten_self_button header_menu_icon <?php echo escape_output($is_self_order_class) ?>"
                                 data-tippy-content="<?php echo lang('self_online_orders'); ?>"><i
                                     class="fa fa-qrcode"></i></a>
                         </li>
-                        <li>
-                            <a href="#" data-title="<?php echo lang('reservation_list'); ?>"
-                                class="reservation_list header_menu_icon <?php echo escape_output($is_self_order_class) ?>"
-                                data-tippy-content="<?php echo lang('reservation_list'); ?>"><i
-                                    class="fa fa-ticket"></i></a>
-                        </li>
-
 
                         <li>
                             <a href="#" id="notification_button"
@@ -1395,14 +1538,158 @@ if ($wl) {
                                 <i class="fal fa-desktop"></i>
                             </a>
                         </li>
-                        <li>
-                            <a href="<?php echo base_url() ?>order-status-screen"
-                                class="header_menu_icon  <?php echo escape_output($is_self_order_class) ?>"
-                                target="_blank" data-tippy-content="<?php
-                                echo lang('order_status_screen');
-                                ?>">
-                                <i class="fa fa-desktop"></i>
+
+                        <!-- More Options Dropdown Button (Language, Future Sales, Reservation List, Order Status Screen) -->
+                        <li class="has__children custom_header_more_li <?php echo escape_output($is_self_order_class) ?>">
+                            <a href="javascript:void(0)" class="header_menu_icon custom_header_more_btn" data-tippy-content="More Options">
+                                <i class="fal fa-ellipsis-v"></i>
                             </a>
+                            <ul class="sub__menu custom_header_more_dropdown" role="menu">
+                                <li>
+                                    <a href="#" id="last_ten_feature_button" class="custom_more_item more_dropdown_action <?php echo escape_output($is_self_order_class) ?>">
+                                        <i class="fas fa-shopping-bag"></i>
+                                        <span><?php echo lang('feature_sales'); ?></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" data-title="<?php echo lang('reservation_list'); ?>" class="reservation_list custom_more_item more_dropdown_action <?php echo escape_output($is_self_order_class) ?>">
+                                        <i class="fa fa-ticket"></i>
+                                        <span><?php echo lang('reservation_list'); ?></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="<?php echo base_url() ?>order-status-screen" target="_blank" class="custom_more_item more_dropdown_action <?php echo escape_output($is_self_order_class) ?>">
+                                        <i class="fa fa-desktop"></i>
+                                        <span><?php echo lang('order_status_screen'); ?></span>
+                                    </a>
+                                </li>
+                                <li class="custom_more_divider"></li>
+                                <li class="custom_lang_submenu_parent">
+                                    <a href="javascript:void(0)" class="custom_more_item custom_lang_trigger">
+                                        <i class="fal fa-globe"></i>
+                                        <span><?php echo lang('language'); ?></span>
+                                        <i class="fal fa-chevron-right custom_submenu_chevron"></i>
+                                    </a>
+                                    <ul class="custom_lang_sub_menu" role="menu">
+                                        <?php
+                                        $language = $this->session->userdata('language');
+                                        if (!$language) {
+                                            $language = "english";
+                                        }
+                                        $dir = glob("application/language/*", GLOB_ONLYDIR);
+                                        foreach ($dir as $value):
+                                            $separete = explode("language/", $value);
+                                            ?>
+                                            <li class="<?= isset($language) && $language == $separete[1] ? 'active_lng' : '' ?>">
+                                                <a class="action_main_menu custom_lang_sub_item"
+                                                    data-url="<?php echo base_url(); ?>Authentication/setlanguagePOS/<?= escape_output($separete[1]) ?>"
+                                                    href="#">
+                                                    <span><?php echo escape_output(ucfirstcustom($separete[1])) ?></span>
+                                                    <?php if (isset($language) && $language == $separete[1]): ?>
+                                                        <i class="fal fa-check active_check_icon"></i>
+                                                    <?php endif; ?>
+                                                </a>
+                                            </li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <!-- Items Quick Add Dropdown Button -->
+                        <li class="has__children custom_header_item_li <?php echo escape_output($is_self_order_class) ?>">
+                            <a href="javascript:void(0)" class="header_menu_icon custom_header_item_btn" data-tippy-content="Items / Quick Add">
+                                <i class="fal fa-file-alt"></i>
+                            </a>
+                            <ul class="sub__menu custom_header_item_dropdown" role="menu">
+                                <li class="custom_item_dropdown_title">
+                                    <i class="fal fa-file-alt"></i> <?php echo lang('Item'); ?>
+                                </li>
+                                <li>
+                                    <a href="<?php echo base_url() ?>Unit/addEditUnit" target="_blank" class="custom_item_link more_dropdown_action">
+                                        <i class="fa fa-angle-double-right"></i>
+                                        <span><?php echo lang('Add'); ?> <?php echo lang('Ingredient_Unit'); ?></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="<?php echo base_url() ?>Unit/Units" target="_blank" class="custom_item_link more_dropdown_action">
+                                        <i class="fa fa-angle-double-right"></i>
+                                        <span><?php echo lang('List'); ?> <?php echo lang('Ingredient_Unit'); ?></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="<?php echo base_url() ?>ingredientCategory/addEditIngredientCategory" target="_blank" class="custom_item_link more_dropdown_action">
+                                        <i class="fa fa-angle-double-right"></i>
+                                        <span><?php echo lang('Add'); ?> <?php echo lang('ingredient_category'); ?></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="<?php echo base_url() ?>ingredientCategory/ingredientCategories" target="_blank" class="custom_item_link more_dropdown_action">
+                                        <i class="fa fa-angle-double-right"></i>
+                                        <span><?php echo lang('List'); ?> <?php echo lang('ingredient_category'); ?></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="<?php echo base_url() ?>ingredient/addEditIngredient" target="_blank" class="custom_item_link more_dropdown_action">
+                                        <i class="fa fa-angle-double-right"></i>
+                                        <span><?php echo lang('Add'); ?> <?php echo lang('ingredient'); ?></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="<?php echo base_url() ?>ingredient/ingredients" target="_blank" class="custom_item_link more_dropdown_action">
+                                        <i class="fa fa-angle-double-right"></i>
+                                        <span><?php echo lang('List'); ?> <?php echo lang('ingredient'); ?></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="<?php echo base_url() ?>modifier/addEditModifier" target="_blank" class="custom_item_link more_dropdown_action">
+                                        <i class="fa fa-angle-double-right"></i>
+                                        <span><?php echo lang('Add'); ?> <?php echo lang('modifier'); ?></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="<?php echo base_url() ?>modifier/modifiers" target="_blank" class="custom_item_link more_dropdown_action">
+                                        <i class="fa fa-angle-double-right"></i>
+                                        <span><?php echo lang('List'); ?> <?php echo lang('modifier'); ?></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="<?php echo base_url() ?>foodMenuCategory/addEditFoodMenuCategory" target="_blank" class="custom_item_link more_dropdown_action">
+                                        <i class="fa fa-angle-double-right"></i>
+                                        <span><?php echo lang('Add'); ?> <?php echo lang('food_menu_category'); ?></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="<?php echo base_url() ?>foodMenuCategory/foodMenuCategories" target="_blank" class="custom_item_link more_dropdown_action">
+                                        <i class="fa fa-angle-double-right"></i>
+                                        <span><?php echo lang('List'); ?> <?php echo lang('food_menu_category'); ?></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="<?php echo base_url() ?>foodMenu/addEditFoodMenu" target="_blank" class="custom_item_link more_dropdown_action">
+                                        <i class="fa fa-angle-double-right"></i>
+                                        <span><?php echo lang('Add'); ?> <?php echo lang('food_menu'); ?></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="<?php echo base_url() ?>foodMenu/foodMenus" target="_blank" class="custom_item_link more_dropdown_action">
+                                        <i class="fa fa-angle-double-right"></i>
+                                        <span><?php echo lang('List'); ?> <?php echo lang('food_menu'); ?></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="<?php echo base_url() ?>PreMadeFood/addEditPreMadeFood" target="_blank" class="custom_item_link more_dropdown_action">
+                                        <i class="fa fa-angle-double-right"></i>
+                                        <span><?php echo lang('Add'); ?> <?php echo lang('premade_food'); ?></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="<?php echo base_url() ?>PreMadeFood/preMadeFoods" target="_blank" class="custom_item_link more_dropdown_action">
+                                        <i class="fa fa-angle-double-right"></i>
+                                        <span><?php echo lang('List'); ?> <?php echo lang('premade_food'); ?></span>
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
 
                     </ul>
@@ -5753,6 +6040,17 @@ if ($wl) {
             });
             // Select "All" by default on load
             $(".get_area_table[data-id='all']").parent().addClass("active-area-li");
+
+            // Header More Options Dropdown - close on clicking direct action
+            $(document).on("click", ".more_dropdown_action", function() {
+                $(this).closest(".custom_header_more_dropdown").slideUp(200);
+            });
+            // Header More Options Dropdown - toggle language sub-list
+            $(document).on("click", ".custom_lang_trigger", function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).siblings(".custom_lang_sub_menu").slideToggle(200);
+            });
 
             // Auto open customer display disabled per user request
             /*
