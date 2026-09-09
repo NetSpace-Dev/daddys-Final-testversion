@@ -1038,6 +1038,38 @@ class Common_model extends CI_Model {
      * @param string
      */
     public function getAllKitchenItems($sales_id,$printer_id,$kot_print){
+        $main_kitchen = $this->db->query("SELECT printer_id FROM tbl_kitchens WHERE LOWER(TRIM(name)) = 'main kitchen' AND del_status = 'Live' LIMIT 1")->row();
+        $main_printer_id = $main_kitchen ? $main_kitchen->printer_id : null;
+
+        $is_modified_order = $this->db->where('sales_id', $sales_id)->where('is_print', 2)->get('tbl_kitchen_sales_details')->num_rows() > 0;
+
+        if ($main_printer_id && $printer_id == $main_printer_id && !$is_modified_order) {
+            // Check if this order contains any items assigned to Main Kitchen
+            $has_main_items = $this->db->from('tbl_kitchen_sales_details')
+                ->join('tbl_food_menus', 'tbl_food_menus.id = tbl_kitchen_sales_details.food_menu_id', 'left')
+                ->join('tbl_kitchen_categories', 'tbl_kitchen_categories.cat_id = tbl_food_menus.category_id', 'left')
+                ->join('tbl_kitchens', 'tbl_kitchens.id = tbl_kitchen_categories.kitchen_id', 'left')
+                ->where('tbl_kitchen_sales_details.sales_id', $sales_id)
+                ->where('tbl_kitchen_categories.del_status', 'Live')
+                ->where('tbl_kitchens.printer_id', $main_printer_id)
+                ->count_all_results() > 0;
+
+            if ($has_main_items) {
+                // If order has items for Main Kitchen, print full order on Main Kitchen
+                $this->db->select("tbl_kitchen_sales_details.menu_name,tbl_kitchen_sales_details.qty,tbl_kitchen_sales_details.tmp_qty,tbl_kitchen_sales_details.menu_combo_items,tbl_kitchen_sales_details.menu_note,tbl_kitchen_sales_details.id as sales_details_id,tbl_kitchen_sales_details.is_print");
+                $this->db->from('tbl_kitchen_sales_details');
+                $this->db->where("sales_id", $sales_id);
+                if($kot_print==2){
+                    $this->db->where("(tbl_kitchen_sales_details.is_print = 1 OR tbl_kitchen_sales_details.is_print IS NULL)");
+                }
+                $this->db->order_by('tbl_kitchen_sales_details.id', 'ASC');
+                return $this->db->get()->result();
+            } else {
+                // No Main Kitchen items in this order -> Do NOT print on Main Kitchen
+                return array();
+            }
+        }
+
         $this->db->select("tbl_kitchen_sales_details.menu_name,tbl_kitchen_sales_details.qty,tbl_kitchen_sales_details.tmp_qty,tbl_kitchen_sales_details.menu_combo_items,tbl_kitchen_sales_details.menu_note,tbl_kitchen_sales_details.id as sales_details_id,tbl_kitchen_sales_details.is_print");
         $this->db->from('tbl_kitchen_sales_details');
         $this->db->join('tbl_food_menus', 'tbl_food_menus.id = tbl_kitchen_sales_details.food_menu_id', 'left');
@@ -1062,6 +1094,37 @@ class Common_model extends CI_Model {
      * @param string
      */
     public function getAllKitchenItemsAuto($sales_id,$printer_id){
+        $main_kitchen = $this->db->query("SELECT printer_id FROM tbl_kitchens WHERE LOWER(TRIM(name)) = 'main kitchen' AND del_status = 'Live' LIMIT 1")->row();
+        $main_printer_id = $main_kitchen ? $main_kitchen->printer_id : null;
+
+        $is_modified_order = $this->db->where('sales_id', $sales_id)->where('is_print', 2)->get('tbl_kitchen_sales_details')->num_rows() > 0;
+
+        if ($main_printer_id && $printer_id == $main_printer_id && !$is_modified_order) {
+            // Check if this order contains any unprinted items assigned to Main Kitchen
+            $has_main_items = $this->db->from('tbl_kitchen_sales_details')
+                ->join('tbl_food_menus', 'tbl_food_menus.id = tbl_kitchen_sales_details.food_menu_id', 'left')
+                ->join('tbl_kitchen_categories', 'tbl_kitchen_categories.cat_id = tbl_food_menus.category_id', 'left')
+                ->join('tbl_kitchens', 'tbl_kitchens.id = tbl_kitchen_categories.kitchen_id', 'left')
+                ->where('tbl_kitchen_sales_details.sales_id', $sales_id)
+                ->where('tbl_kitchen_sales_details.is_print', 1)
+                ->where('tbl_kitchen_categories.del_status', 'Live')
+                ->where('tbl_kitchens.printer_id', $main_printer_id)
+                ->count_all_results() > 0;
+
+            if ($has_main_items) {
+                // If order has items for Main Kitchen, print full order on Main Kitchen
+                $this->db->select("tbl_kitchen_sales_details.menu_name,tbl_kitchen_sales_details.qty,tbl_kitchen_sales_details.tmp_qty,tbl_kitchen_sales_details.menu_combo_items,tbl_kitchen_sales_details.menu_note,tbl_kitchen_sales_details.id as sales_details_id,tbl_kitchen_sales_details.is_print");
+                $this->db->from('tbl_kitchen_sales_details');
+                $this->db->where("sales_id", $sales_id);
+                $this->db->where("tbl_kitchen_sales_details.is_print", 1);
+                $this->db->order_by('tbl_kitchen_sales_details.id', 'ASC');
+                return $this->db->get()->result();
+            } else {
+                // No Main Kitchen items in this order -> Do NOT print on Main Kitchen
+                return array();
+            }
+        }
+
         $this->db->select("tbl_kitchen_sales_details.menu_name,tbl_kitchen_sales_details.qty,tbl_kitchen_sales_details.tmp_qty,tbl_kitchen_sales_details.menu_combo_items,tbl_kitchen_sales_details.menu_note,tbl_kitchen_sales_details.id as sales_details_id,tbl_kitchen_sales_details.is_print");
         $this->db->from('tbl_kitchen_sales_details');
         $this->db->join('tbl_food_menus', 'tbl_food_menus.id = tbl_kitchen_sales_details.food_menu_id', 'left');
