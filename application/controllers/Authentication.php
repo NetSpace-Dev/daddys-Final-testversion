@@ -1988,8 +1988,11 @@ class Authentication extends Cl_Controller {
                 $data['profile_'] = $printer->profile_;
 
                 //$sale = $this->get_all_information_of_a_sale($sale_id);
-                $data['date'] = date($company->date_format, strtotime($sale->sale_date));
-                $data['time_inv'] = date('h:i A',strtotime($sale->order_time));
+                // Fix: null/empty sale_date or order_time from JS → strtotime()=false=0=1970
+                $sale_date_ts = (!empty($sale->sale_date) && strtotime($sale->sale_date)) ? strtotime($sale->sale_date) : time();
+                $data['date'] = date($company->date_format, $sale_date_ts);
+                $order_time_ts = (!empty($sale->order_time) && strtotime($sale->order_time)) ? strtotime($sale->order_time) : time();
+                $data['time_inv'] = date('h:i A', $order_time_ts);
                 $order_type = '';
                 if($sale->order_type == 1){
                     $order_type = lang('dine');
@@ -2129,8 +2132,11 @@ class Authentication extends Cl_Controller {
                 $data['profile_'] = $printer->profile_;
 
                 //$sale = $this->get_all_information_of_a_sale($sale_id);
-                $data['date'] = date($company->date_format, strtotime($sale->open_invoice_date_hidden));
-                $data['time_inv'] = date('h:i A',strtotime($sale->order_time));
+                // Fix: null/empty open_invoice_date_hidden or order_time from JS → strtotime()=false=0=1970
+                $invoice_date_ts = (!empty($sale->open_invoice_date_hidden) && strtotime($sale->open_invoice_date_hidden)) ? strtotime($sale->open_invoice_date_hidden) : time();
+                $data['date'] = date($company->date_format, $invoice_date_ts);
+                $order_time_ts2 = (!empty($sale->order_time) && strtotime($sale->order_time)) ? strtotime($sale->order_time) : time();
+                $data['time_inv'] = date('h:i A', $order_time_ts2);
                 $data['random_code'] = base_url()."invoice/".$sale->random_code;
 
                 $order_type = '';

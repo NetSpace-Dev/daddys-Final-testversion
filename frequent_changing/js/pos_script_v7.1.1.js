@@ -2477,7 +2477,13 @@
         if (mm < 10) {
             mm = "0" + mm;
         }
-        let time_a = new Date().toLocaleTimeString();
+        // Fix: toLocaleTimeString() on Windows 11 uses narrow no-break space (\u202f)
+        // before AM/PM which PHP strtotime() cannot parse → returns false → 1970 date bug.
+        // Use 24h format "HH:MM:SS" instead for reliable PHP parsing.
+        let hh = String(today.getHours()).padStart(2, '0');
+        let min = String(today.getMinutes()).padStart(2, '0');
+        let sec = String(today.getSeconds()).padStart(2, '0');
+        let time_a = hh + ":" + min + ":" + sec;
         let today_date = yyyy + "-" + mm + "-" + dd;
         let date_time = today_date + " " + time_a;
         return [date_time, time_a];
