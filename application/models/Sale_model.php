@@ -367,6 +367,7 @@ class Sale_model extends CI_Model {
         // Treat as waiter if session is_waiter=Yes OR user designation is Waiter
         $is_waiter_mode = (isset($is_waiter) && $is_waiter == "Yes") || ($designation == "Waiter");
 
+        // 1. Fetch active orders from tbl_sales
         $this->db->select("*,tbl_sales.id as sale_id,tbl_customers.name as customer_name, tbl_sales.id as sales_id,tbl_users.full_name as waiter_name,tbl_tables.name as table_name,tbl_customers.phone as phone");
         $this->db->from('tbl_sales');
         $this->db->join('tbl_tables', 'tbl_tables.id = tbl_sales.table_id', 'left');
@@ -387,14 +388,47 @@ class Sale_model extends CI_Model {
         $this->db->where("(order_status='1' OR order_status='2')");
         $this->db->where("(future_sale_status='1' OR future_sale_status='3')");
         $this->db->order_by('tbl_sales.id', 'ASC');
-        $result = $this->db->get();
+        $sales_result = $this->db->get()->result();
 
-        if($result != false){
-            return $result->result();
-        }else{
-            return false;
+        $existing_sale_nos = array();
+        if (!empty($sales_result)) {
+            foreach ($sales_result as $sr) {
+                if (!empty($sr->sale_no)) $existing_sale_nos[$sr->sale_no] = true;
+            }
+        } else {
+            $sales_result = array();
         }
 
+        // 2. Fetch active running orders from tbl_kitchen_sales that are not yet in tbl_sales or closed
+        $this->db->select("*, tbl_kitchen_sales.id as sale_id, tbl_customers.name as customer_name, tbl_kitchen_sales.id as sales_id, tbl_users.full_name as waiter_name, tbl_customers.phone as phone");
+        $this->db->from('tbl_kitchen_sales');
+        $this->db->join('tbl_users', 'tbl_users.id = tbl_kitchen_sales.waiter_id', 'left');
+        $this->db->join('tbl_customers', 'tbl_customers.id = tbl_kitchen_sales.customer_id', 'left');
+        if($is_waiter_mode){
+            $this->db->where("(tbl_kitchen_sales.order_type = 1 OR tbl_kitchen_sales.waiter_id = " . $this->db->escape($user_id) . ")");
+        }else{
+            if(isset($role) && $role != "Admin"){
+                $this->db->where("(tbl_kitchen_sales.order_type = 1 OR tbl_kitchen_sales.user_id = " . $this->db->escape($user_id) . ")");
+            }
+        }
+        $this->db->where("tbl_kitchen_sales.outlet_id", $outlet_id);
+        $this->db->where("tbl_kitchen_sales.del_status", "Live");
+        $this->db->where_in("tbl_kitchen_sales.order_type", array(1, 2, 3));
+        $kitchen_sales = $this->db->get()->result();
+
+        if (!empty($kitchen_sales)) {
+            foreach ($kitchen_sales as $ks) {
+                if (isset($existing_sale_nos[$ks->sale_no])) continue;
+                
+                // Check if already paid/closed in tbl_sales
+                $is_closed = $this->db->query("SELECT id FROM tbl_sales WHERE (sale_no = " . $this->db->escape($ks->sale_no) . " OR id = " . $this->db->escape($ks->id) . ") AND outlet_id = " . $this->db->escape($outlet_id) . " AND order_status = 3 AND del_status = 'Live'")->row();
+                if ($is_closed) continue;
+
+                $sales_result[] = $ks;
+            }
+        }
+
+        return $sales_result;
     }
 
     public function future_sales($outlet_id){

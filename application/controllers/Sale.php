@@ -2634,16 +2634,23 @@ We hope to see you again!";
     public function get_new_orders(){
         $outlet_id = $this->session->userdata('outlet_id');
         $data1 = $this->Sale_model->getNewOrders($outlet_id);
-        $i = 0;
-        for($i;$i<count($data1);$i++){
-            $data1[$i]->total_kitchen_type_items = $this->Sale_model->get_total_kitchen_type_items($data1[$i]->sale_id);
-            $data1[$i]->total_kitchen_type_done_items = $this->Sale_model->get_total_kitchen_type_done_items($data1[$i]->sale_id);
-            $data1[$i]->total_kitchen_type_started_cooking_items = $this->Sale_model->get_total_kitchen_type_started_cooking_items($data1[$i]->sale_id);
-            $data1[$i]->tables_booked = $this->Sale_model->get_all_tables_of_a_sale_items($data1[$i]->sale_id);
-            $data1[$i]->items = $this->Sale_model->getAllItemsFromSalesDetailBySalesId($data1[$i]->sale_id);
+        if (!$data1) $data1 = array();
+        for($i = 0; $i < count($data1); $i++){
+            $sale_id = $data1[$i]->sale_id;
+            $data1[$i]->total_kitchen_type_items = $this->Sale_model->get_total_kitchen_type_items($sale_id);
+            $data1[$i]->total_kitchen_type_done_items = $this->Sale_model->get_total_kitchen_type_done_items($sale_id);
+            $data1[$i]->total_kitchen_type_started_cooking_items = $this->Sale_model->get_total_kitchen_type_started_cooking_items($sale_id);
+            $data1[$i]->tables_booked = $this->Sale_model->get_all_tables_of_a_sale_items($sale_id);
+
+            // Fetch items from tbl_sales_details, fallback to tbl_kitchen_sales_details
+            $items = $this->Sale_model->getAllItemsFromSalesDetailBySalesId($sale_id);
+            if (empty($items)) {
+                $items = $this->Sale_model->getAllItemsFromSalesDetailBySalesIdKitchen($sale_id);
+            }
+            $data1[$i]->items = $items;
 
             $to_time = strtotime(date('Y-m-d H:i:s'));
-            $from_time = strtotime($data1[$i]->date_time);
+            $from_time = (!empty($data1[$i]->date_time) && strtotime($data1[$i]->date_time)) ? strtotime($data1[$i]->date_time) : $to_time;
             $minutes = floor(abs($to_time - $from_time) / 60);
             $seconds = abs($to_time - $from_time) % 60;
 

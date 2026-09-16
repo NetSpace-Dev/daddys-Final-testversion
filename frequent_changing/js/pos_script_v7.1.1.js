@@ -295,15 +295,15 @@
 
     request.onsuccess = function (event) {
         db = request.result;
-        if (waiter_app_status == "Yes") {
+        displayOrderList();
+        if (typeof displayServerOrders === 'function') displayServerOrders();
+        if (typeof loadAllTableStates === 'function') loadAllTableStates();
+        if (typeof sync_server_orders_to_local_db === 'function') {
             sync_server_orders_to_local_db(function() {
-                // Start auto-polling after first sync completes
                 startAutoPolling();
             });
         } else {
-            displayOrderList();
-            // Start auto-polling after initial load
-            setTimeout(startAutoPolling, 2000);
+            setTimeout(startAutoPolling, 1500);
         }
     }
 
@@ -14253,6 +14253,19 @@
                     let objectStore = transaction.objectStore("sales");
                     let server_order_ids = [];
 
+                    transaction.oncomplete = function () {
+                        consecutivePollFailures = 0;
+                        displayOrderList();
+                        if (typeof displayServerOrders === 'function') displayServerOrders();
+                        if (typeof loadAllTableStates === 'function') loadAllTableStates();
+                        if (typeof success_cb === "function") success_cb();
+                    };
+
+                    transaction.onerror = function () {
+                        displayOrderList();
+                        if (typeof error_cb === "function") error_cb();
+                    };
+
                     objectStore.openCursor().onsuccess = function (event) {
                         let cursor = event.target.result;
                         if (cursor) {
@@ -14315,9 +14328,6 @@
                                     objectStore.put(order_object);
                                 }
                             });
-                            consecutivePollFailures = 0;
-                            displayOrderList();
-                            if (typeof success_cb === "function") success_cb();
                         }
                     };
                 } else {
@@ -22740,27 +22750,22 @@
 
         _autoPollBusy = true;
 
-        if (waiter_app_status == "Yes") {
-            // Tab mode — sync server orders → IndexedDB → display
+        try {
+            if (typeof displayServerOrders === 'function') displayServerOrders();
+            if (typeof loadAllTableStates  === 'function') loadAllTableStates();
             if (typeof sync_server_orders_to_local_db === 'function') {
                 sync_server_orders_to_local_db(
                     function () { _autoPollBusy = false; updateLastSyncedTime(); },
-                    function () { _autoPollBusy = false; }
+                    function () { _autoPollBusy = false; updateLastSyncedTime(); }
                 );
             } else {
                 _autoPollBusy = false;
-            }
-        } else {
-            // POS mode — fetch server orders & table states
-            try {
-                if (typeof displayServerOrders === 'function') displayServerOrders();
-                if (typeof loadAllTableStates  === 'function') loadAllTableStates();
-            } catch (err) {
-                console.error("[runAutoPoll] Error in POS mode poll:", err);
-            } finally {
-                _autoPollBusy = false;
                 updateLastSyncedTime();
             }
+        } catch (err) {
+            console.error("[runAutoPoll] Error in poll:", err);
+            _autoPollBusy = false;
+            updateLastSyncedTime();
         }
     }
 
