@@ -2332,6 +2332,7 @@
                         };
                     }
                 }
+            },
             error: function (xhr, status) {
                 console.error("[add_kitchen_sale_by_ajax] Order submission failed:", status, xhr ? xhr.status : 'N/A');
                 toastr.options = { positionClass: 'toast-bottom-right', timeOut: 7000 };
