@@ -315,10 +315,14 @@ foreach ($customers as $customer) {
     if ($customer->id == 1) {
         $check_walk_in_customer++;
     }
+    $c_name = getPlanText($customer->name);
+    $c_phone = trim($customer->phone);
+    $c_display = $c_name . ($c_phone ? ' (' . $c_phone . ')' : '');
+
     if ($customer->name == 'Walk-in Customer') {
-        $customers_option = '<option ' . $selected . ' data-default_discount="' . $customer->default_discount . '" data-same_or_diff_state="' . $customer->same_or_diff_state . '"  data-customer_address="' . getPlanText($customer->address) . '" data-customer_phone="' . $customer->phone . '" data-customer_gst_number="' . getPlanText($customer->gst_number) . '" data-current_due="' . $current_due . '" value="' . $customer->id . '" selected>' . (getPlanText($customer->name)) . ' ' . $customer->phone . '</option>' . $customers_option;
+        $customers_option = '<option ' . $selected . ' data-default_discount="' . $customer->default_discount . '" data-same_or_diff_state="' . $customer->same_or_diff_state . '"  data-customer_address="' . getPlanText($customer->address) . '" data-customer_phone="' . $customer->phone . '" data-customer_gst_number="' . getPlanText($customer->gst_number) . '" data-current_due="' . $current_due . '" value="' . $customer->id . '" selected>' . $c_display . '</option>' . $customers_option;
     } else {
-        $customers_option .= '<option ' . $selected . ' data-default_discount="' . $customer->default_discount . '" data-same_or_diff_state="' . $customer->same_or_diff_state . '"  data-customer_address="' . getPlanText($customer->address) . '" data-customer_phone="' . $customer->phone . '" data-customer_gst_number="' . getPlanText($customer->gst_number) . '" data-current_due="' . $current_due . '" value="' . $customer->id . '" ' . $selected . '>' . (getPlanText($customer->name)) . ' ' . $customer->phone . '</option>';
+        $customers_option .= '<option ' . $selected . ' data-default_discount="' . $customer->default_discount . '" data-same_or_diff_state="' . $customer->same_or_diff_state . '"  data-customer_address="' . getPlanText($customer->address) . '" data-customer_phone="' . $customer->phone . '" data-customer_gst_number="' . getPlanText($customer->gst_number) . '" data-current_due="' . $current_due . '" value="' . $customer->id . '" ' . $selected . '>' . $c_display . '</option>';
     }
 
     if ($total_customers == $i) {
@@ -1368,6 +1372,149 @@ if ($wl) {
         }
         .custom_header_item_dropdown .custom_item_link:hover i {
             color: #0284c7 !important;
+        }
+
+        /* =========================================================
+           Ultra-Crisp Modern Select2 & Customer Dropdown Styling
+           ========================================================= */
+        .waiter_customer .select2-container .select2-selection--single,
+        .select2-container--default .select2-selection--single {
+            height: 38px !important;
+            border: 1.5px solid #cbd5e1 !important;
+            border-radius: 8px !important;
+            background-color: #ffffff !important;
+            display: flex !important;
+            align-items: center !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+            transition: all 0.2s ease-in-out !important;
+        }
+
+        .waiter_customer .select2-container--open .select2-selection--single,
+        .select2-container--default.select2-container--open .select2-selection--single {
+            border-color: #7367f0 !important;
+            box-shadow: 0 0 0 3px rgba(115, 103, 240, 0.18) !important;
+        }
+
+        .waiter_customer .select2-container .select2-selection--single .select2-selection__rendered,
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            color: #1e293b !important;
+            font-size: 13.5px !important;
+            font-weight: 600 !important;
+            padding-left: 12px !important;
+            padding-right: 28px !important;
+            line-height: 36px !important;
+        }
+
+        .waiter_customer .select2-container--default .select2-selection--single .select2-selection__arrow,
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 36px !important;
+            right: 8px !important;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow b {
+            border-color: #64748b transparent transparent transparent !important;
+            border-width: 6px 5px 0 5px !important;
+        }
+
+        .select2-container--default.select2-container--open .select2-selection--single .select2-selection__arrow b {
+            border-color: transparent transparent #7367f0 transparent !important;
+            border-width: 0 5px 6px 5px !important;
+        }
+
+        /* Dropdown Panel */
+        .select2-dropdown {
+            border: 1.5px solid #e2e8f0 !important;
+            border-radius: 10px !important;
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.15), 0 4px 10px rgba(0, 0, 0, 0.05) !important;
+            background: #ffffff !important;
+            z-index: 999999 !important;
+            overflow: hidden !important;
+            margin-top: 4px !important;
+            min-width: 280px !important;
+        }
+
+        /* Search Box inside Dropdown */
+        .select2-search--dropdown {
+            padding: 10px 12px !important;
+            background-color: #f8fafc !important;
+            border-bottom: 1px solid #e2e8f0 !important;
+        }
+
+        .select2-search--dropdown .select2-search__field {
+            height: 36px !important;
+            padding: 6px 12px !important;
+            border: 1.5px solid #cbd5e1 !important;
+            border-radius: 6px !important;
+            font-size: 13.5px !important;
+            font-weight: 500 !important;
+            color: #1e293b !important;
+            background-color: #ffffff !important;
+            outline: none !important;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+            transition: all 0.2s ease !important;
+        }
+
+        .select2-search--dropdown .select2-search__field:focus {
+            border-color: #7367f0 !important;
+            box-shadow: 0 0 0 3px rgba(115, 103, 240, 0.15) !important;
+        }
+
+        /* Dropdown Options List */
+        .select2-results__options {
+            max-height: 260px !important;
+            padding: 6px !important;
+        }
+
+        /* Custom Scrollbar for Options */
+        .select2-results__options::-webkit-scrollbar {
+            width: 6px !important;
+        }
+
+        .select2-results__options::-webkit-scrollbar-track {
+            background: #f1f5f9 !important;
+            border-radius: 3px !important;
+        }
+
+        .select2-results__options::-webkit-scrollbar-thumb {
+            background: #cbd5e1 !important;
+            border-radius: 3px !important;
+        }
+
+        .select2-results__options::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8 !important;
+        }
+
+        /* Single Option Item */
+        .select2-container--default .select2-results__option {
+            padding: 9px 14px !important;
+            font-size: 13.5px !important;
+            font-weight: 600 !important;
+            color: #334155 !important;
+            border-radius: 6px !important;
+            margin-bottom: 2px !important;
+            transition: all 0.15s ease !important;
+            cursor: pointer !important;
+            border-bottom: 1px solid #f8fafc !important;
+        }
+
+        /* Hover / Highlighted State */
+        .select2-container--default .select2-results__option--highlighted[aria-selected] {
+            background: linear-gradient(135deg, #7367f0 0%, #5e50ee 100%) !important;
+            color: #ffffff !important;
+            font-weight: 600 !important;
+            box-shadow: 0 2px 6px rgba(115, 103, 240, 0.3) !important;
+        }
+
+        /* Selected State */
+        .select2-container--default .select2-results__option[aria-selected="true"] {
+            background-color: #f1f0fe !important;
+            color: #7367f0 !important;
+            font-weight: 700 !important;
+        }
+
+        .select2-container--default .select2-results__option--highlighted[aria-selected="true"] {
+            background: linear-gradient(135deg, #7367f0 0%, #5e50ee 100%) !important;
+            color: #ffffff !important;
         }
     </style>
 </head>
