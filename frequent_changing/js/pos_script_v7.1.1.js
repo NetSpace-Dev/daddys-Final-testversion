@@ -19640,9 +19640,16 @@
     }
     forMobileDevice();
 
-    $(window).on("load", function () {
-        $(".preloader").fadeOut(500);
-    });
+    function hidePreloader() {
+        $(".preloader").fadeOut(400);
+    }
+    if (document.readyState === "complete" || document.readyState === "interactive") {
+        hidePreloader();
+    } else {
+        $(window).on("load", hidePreloader);
+        $(document).ready(hidePreloader);
+    }
+    setTimeout(hidePreloader, 1500);
 
     $(document).on("click", "#bill_show_details", function (e) {
         if (

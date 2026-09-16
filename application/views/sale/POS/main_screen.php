@@ -1387,6 +1387,30 @@ if ($wl) {
     <div class="preloader">
         <div class="loader"><?php echo lang('loading'); ?></div>
     </div>
+    <script type="text/javascript">
+        (function() {
+            function removeLoader() {
+                var el = document.querySelector('.preloader');
+                if (el) {
+                    el.style.transition = 'opacity 0.4s ease';
+                    el.style.opacity = '0';
+                    setTimeout(function() {
+                        if (el && el.parentNode) {
+                            el.style.display = 'none';
+                        }
+                    }, 400);
+                }
+            }
+            if (document.readyState === 'complete') {
+                removeLoader();
+            } else {
+                window.addEventListener('load', removeLoader);
+                document.addEventListener('DOMContentLoaded', removeLoader);
+            }
+            // Absolute safety timeout
+            setTimeout(removeLoader, 2000);
+        })();
+    </script>
 
     <span id="stop_refresh_for_search" class="ir_display_none"><?php echo lang('yes'); ?></span>
     <div id="main-wrapper-content" class="wrapper">
