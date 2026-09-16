@@ -1468,11 +1468,12 @@ if ($wl) {
                                 <span class="net-status-latency" style="font-size: 11px; opacity: 0.85; margin-left: 2px;"></span>
                             </div>
                         </li>
-                        <li id="force_sync_li" style="display: inline-flex; align-items: center; margin-right: 8px;">
-                            <button id="btn_force_sync" type="button" class="btn-force-sync" title="Force Sync Tables & Orders">
+                        <li id="force_sync_li" style="display: inline-flex; align-items: center; margin-right: 8px; flex-direction: column;">
+                            <button id="btn_force_sync" type="button" class="btn-force-sync" title="Force Sync Tables &amp; Orders">
                                 <i class="fal fa-sync-alt" id="sync_icon_spin"></i>
                                 <span>Sync</span>
                             </button>
+                            <span id="last_synced_time" style="font-size: 9px; color: #aaa; margin-top: 2px; letter-spacing: 0.3px;" title="Last auto-synced at">--:--:--</span>
                         </li>
                         <li>
                             <a href="#" id="open_hold_sales"

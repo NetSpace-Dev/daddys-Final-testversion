@@ -296,9 +296,14 @@
     request.onsuccess = function (event) {
         db = request.result;
         if (waiter_app_status == "Yes") {
-            sync_server_orders_to_local_db();
+            sync_server_orders_to_local_db(function() {
+                // Start auto-polling after first sync completes
+                startAutoPolling();
+            });
         } else {
             displayOrderList();
+            // Start auto-polling after initial load
+            setTimeout(startAutoPolling, 2000);
         }
     }
 
@@ -1255,17 +1260,19 @@
         });
     }
 
-    function displayServerOrders() {
+    function displayServerOrders(retryCount) {
+        if (typeof retryCount === 'undefined') retryCount = 1;
         let startTime = Date.now();
         $.ajax({
             url: base_url + "Sale/get_new_orders_ajax",
             method: "GET",
             dataType: "json",
-            timeout: 4500,
+            timeout: 7000,
             success: function (response) {
+                consecutivePollFailures = 0;
                 let latency = Date.now() - startTime;
                 if (typeof updateNetworkStatus === 'function') {
-                    updateNetworkStatus(latency > 2500 ? 'slow' : 'online', latency);
+                    updateNetworkStatus(latency > 3500 ? 'slow' : 'online', latency);
                 }
                 if (!response || response.length === 0) return;
                 console.log("[displayServerOrders] Server orders fetched:", response);
@@ -1342,6 +1349,15 @@
                 loadAllTableStates();
             },
             error: function (xhr, status) {
+                if (retryCount > 0 && navigator.onLine) {
+                    console.warn(`[displayServerOrders] Poll ${status}. Retrying in 2s... (${retryCount} left)`);
+                    setTimeout(function () {
+                        displayServerOrders(retryCount - 1);
+                    }, 2000);
+                    return;
+                }
+                console.error("[displayServerOrders] poll failed:", status, xhr ? xhr.status : 'N/A');
+                consecutivePollFailures++;
                 if (typeof updateNetworkStatus === 'function') {
                     if (status === 'timeout' || !navigator.onLine) {
                         updateNetworkStatus('offline');
@@ -1445,7 +1461,8 @@
     }
 
     let currentTableLoadToken = 0;
-    function loadAllTableStates() {
+    function loadAllTableStates(retryCount) {
+        if (typeof retryCount === 'undefined') retryCount = 1;
         let token = ++currentTableLoadToken;
         // Clear all previously appended running order rows in tables
         $(".old_added_table").remove();
@@ -1482,7 +1499,7 @@
         $.ajax({
             url: base_url + "Sale/getOrderedTable",
             method: "POST",
-            timeout: 4500,
+            timeout: 7000,
             data: {
                 csrf_irestoraplus: csrf_value_,
             },
@@ -1680,6 +1697,17 @@
                         }
                     }
                 });
+            },
+            error: function (xhr, status) {
+                if (retryCount > 0 && navigator.onLine) {
+                    console.warn(`[loadAllTableStates] Request ${status}. Retrying in 2s... (${retryCount} left)`);
+                    setTimeout(function () {
+                        loadAllTableStates(retryCount - 1);
+                    }, 2000);
+                    return;
+                }
+                console.error("[loadAllTableStates] poll failed:", status, xhr ? xhr.status : 'N/A');
+                consecutivePollFailures++;
             }
         });
     }
@@ -2304,9 +2332,13 @@
                         };
                     }
                 }
-            },
-            error: function () {
-
+            error: function (xhr, status) {
+                console.error("[add_kitchen_sale_by_ajax] Order submission failed:", status, xhr ? xhr.status : 'N/A');
+                toastr.options = { positionClass: 'toast-bottom-right', timeOut: 7000 };
+                toastr['error']("Connection error: Could not reach server to place order. Please check your internet connection and retry.", "Order Not Placed!");
+                if (typeof updateNetworkStatus === 'function') {
+                    updateNetworkStatus('offline');
+                }
             },
         });
     }
@@ -14193,7 +14225,8 @@
     function set_new_orders_to_view_for_interval() {
         sync_server_orders_to_local_db();
     }
-    function sync_server_orders_to_local_db(success_cb, error_cb) {
+    function sync_server_orders_to_local_db(success_cb, error_cb, retryCount) {
+        if (typeof retryCount === 'undefined') retryCount = 1;
         if (!db) {
             displayServerOrders();
             if (typeof error_cb === "function") error_cb();
@@ -14203,6 +14236,7 @@
             url: base_url + "Sale/get_active_dine_in_orders_with_details_ajax",
             method: "POST",
             dataType: 'json',
+            timeout: 9000,
             data: {
                 csrf_irestoraplus: csrf_value_
             },
@@ -14280,6 +14314,7 @@
                                     objectStore.put(order_object);
                                 }
                             });
+                            consecutivePollFailures = 0;
                             displayOrderList();
                             if (typeof success_cb === "function") success_cb();
                         }
@@ -14289,7 +14324,16 @@
                     if (typeof error_cb === "function") error_cb();
                 }
             },
-            error: function () {
+            error: function (xhr, status) {
+                if (retryCount > 0 && navigator.onLine) {
+                    console.warn(`[sync_server_orders_to_local_db] Poll ${status}. Retrying in 2s... (${retryCount} left)`);
+                    setTimeout(function () {
+                        sync_server_orders_to_local_db(success_cb, error_cb, retryCount - 1);
+                    }, 2000);
+                    return;
+                }
+                console.error("[sync_server_orders_to_local_db] poll failed:", status, xhr ? xhr.status : 'N/A');
+                consecutivePollFailures++;
                 displayOrderList();
                 if (typeof error_cb === "function") error_cb();
             }
@@ -22670,6 +22714,84 @@
     setInterval(checkLiveNetworkHealth, 8000);
     setTimeout(checkLiveNetworkHealth, 1200);
 
+    // ─────────────────────────────────────────────────────────────────
+    // AUTO POLLING — syncs orders & tables every 7 seconds automatically
+    // (Reduced from 12s to shrink inter-terminal staleness window)
+    // ─────────────────────────────────────────────────────────────────
+    let _autoPollInterval = null;   // interval handle
+    let _autoPollBusy     = false;  // prevent overlapping requests
+    const AUTO_POLL_MS    = 7000;   // 7 seconds (stopgap until WebSocket/SSE)
+
+    function runAutoPoll() {
+        // Guard against early-boot race condition: wait until IndexedDB is initialized
+        if (typeof db === "undefined" || !db) return;
+        // Skip if a poll is already running
+        if (_autoPollBusy) return;
+        // Skip if page/tab is hidden (saves server load)
+        if (document.hidden) return;
+
+        _autoPollBusy = true;
+
+        if (waiter_app_status == "Yes") {
+            // Tab mode — sync server orders → IndexedDB → display
+            if (typeof sync_server_orders_to_local_db === 'function') {
+                sync_server_orders_to_local_db(
+                    function () { _autoPollBusy = false; updateLastSyncedTime(); },
+                    function () { _autoPollBusy = false; }
+                );
+            } else {
+                _autoPollBusy = false;
+            }
+        } else {
+            // POS mode — fetch server orders & table states
+            try {
+                if (typeof displayServerOrders === 'function') displayServerOrders();
+                if (typeof loadAllTableStates  === 'function') loadAllTableStates();
+            } catch (err) {
+                console.error("[runAutoPoll] Error in POS mode poll:", err);
+            } finally {
+                _autoPollBusy = false;
+                updateLastSyncedTime();
+            }
+        }
+    }
+
+    function updateLastSyncedTime() {
+        let now = new Date();
+        let hh  = String(now.getHours()).padStart(2, '0');
+        let mm  = String(now.getMinutes()).padStart(2, '0');
+        let ss  = String(now.getSeconds()).padStart(2, '0');
+        let timeStr = hh + ':' + mm + ':' + ss;
+        // Update any element with id="last_synced_time" in the UI
+        $("#last_synced_time").text(timeStr);
+    }
+
+    function startAutoPolling() {
+        // Clear any existing interval to avoid duplicates
+        if (_autoPollInterval) clearInterval(_autoPollInterval);
+        _autoPollInterval = setInterval(runAutoPoll, AUTO_POLL_MS);
+    }
+
+    function stopAutoPolling() {
+        if (_autoPollInterval) {
+            clearInterval(_autoPollInterval);
+            _autoPollInterval = null;
+        }
+    }
+
+    // Pause polling when tab is hidden, resume when visible
+    document.addEventListener('visibilitychange', function () {
+        if (document.hidden) {
+            stopAutoPolling();
+        } else {
+            // Force reset busy flag in case a prior request hung before tab was hidden
+            _autoPollBusy = false;
+            // Immediately sync when user comes back to tab
+            runAutoPoll();
+            startAutoPolling();
+        }
+    });
+
     // Force Sync Click Handler
     $(document).on("click", "#btn_force_sync, .btn-force-sync", function (e) {
         e.preventDefault();
@@ -22683,6 +22805,7 @@
         if (typeof loadAllTableStates === 'function') loadAllTableStates();
         if (typeof displayServerOrders === 'function') displayServerOrders();
         if (typeof sync_server_orders_to_local_db === 'function') sync_server_orders_to_local_db(true);
+        updateLastSyncedTime();
 
         setTimeout(function () {
             $icon.removeClass("sync-spin");

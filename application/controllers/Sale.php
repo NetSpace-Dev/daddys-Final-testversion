@@ -1380,15 +1380,75 @@ class Sale extends Cl_Controller {
             $this->db->where('id', $sale_id);
             $this->db->update('tbl_kitchen_sales', $data_update_text);
         }else{
-            foreach($order_details->orders_table as $single_order_table){
-                $order_table_info = array();
-                $order_table_info['persons'] = $single_order_table->persons;
-                $order_table_info['booking_time'] = date('Y-m-d H:i:s');
-                $order_table_info['sale_id'] = $sale_id;
-                $order_table_info['sale_no'] = $sale_no;
-                $order_table_info['outlet_id'] = $this->session->userdata('outlet_id');
-                $order_table_info['table_id'] = $single_order_table->table_id;
-                $this->db->insert('tbl_orders_table',$order_table_info);
+            $outlet_id = $this->session->userdata('outlet_id');
+
+            if (!empty($order_details->orders_table) && (is_array($order_details->orders_table) || is_object($order_details->orders_table))) {
+                // Pass 1: Pre-validate ALL tables before inserting any table records
+                foreach($order_details->orders_table as $single_order_table){
+                    $target_table_id = $single_order_table->table_id;
+
+                    // Priority 1: Duplicate order safeguard (Fail-Closed) — check if table already has an active order
+                    try {
+                        $query_res = $this->db->query("
+                            SELECT ot.sale_no 
+                            FROM tbl_orders_table ot
+                            LEFT JOIN tbl_sales s ON (s.id = ot.sale_id OR s.sale_no = ot.sale_no)
+                            LEFT JOIN tbl_kitchen_sales ks ON (ks.id = ot.sale_id OR ks.sale_no = ot.sale_no)
+                            WHERE ot.table_id = ? 
+                              AND ot.outlet_id = ?
+                              AND ot.del_status = 'Live'
+                              AND ot.sale_no != ?
+                              AND (
+                                  (s.id IS NOT NULL AND s.del_status = 'Live' AND s.order_status != 3)
+                                  OR
+                                  (ks.id IS NOT NULL AND ks.del_status = 'Live' AND ks.sale_no NOT IN (
+                                      SELECT sale_no FROM tbl_sales WHERE del_status = 'Live' AND outlet_id = ? AND order_status = 3
+                                  ))
+                              )
+                            LIMIT 1
+                        ", array($target_table_id, $outlet_id, $sale_no, $outlet_id));
+
+                        if (!$query_res) {
+                            throw new Exception("Database table verification failed");
+                        }
+                        $active_table_order = $query_res->row();
+                    } catch (Exception $e) {
+                        // Fail-closed: block order if table state cannot be verified safely
+                        $this->db->trans_rollback();
+                        $tbl_name = getTableName($target_table_id);
+                        $err_msg = "Could not verify availability of Table " . $tbl_name . " due to a database/connection error. Order blocked for safety. Please retry.";
+                        echo json_encode(array(
+                            'status' => false,
+                            'message' => $err_msg,
+                            'status_message' => $err_msg
+                        ));
+                        return;
+                    }
+
+                    if ($active_table_order) {
+                        $this->db->trans_rollback();
+                        $tbl_name = getTableName($target_table_id);
+                        $msg = "Table " . $tbl_name . " already has an active order (" . $active_table_order->sale_no . "). Please add items to the existing order instead.";
+                        echo json_encode(array(
+                            'status' => false,
+                            'message' => $msg,
+                            'status_message' => $msg
+                        ));
+                        return;
+                    }
+                }
+
+                // Pass 2: All tables verified free — proceed with inserts
+                foreach($order_details->orders_table as $single_order_table){
+                    $order_table_info = array();
+                    $order_table_info['persons'] = $single_order_table->persons;
+                    $order_table_info['booking_time'] = date('Y-m-d H:i:s');
+                    $order_table_info['sale_id'] = $sale_id;
+                    $order_table_info['sale_no'] = $sale_no;
+                    $order_table_info['outlet_id'] = $outlet_id;
+                    $order_table_info['table_id'] = $single_order_table->table_id;
+                    $this->db->insert('tbl_orders_table',$order_table_info);
+                }
             }
         }
         if($sale_id>0 && count($order_details->items)>0){
