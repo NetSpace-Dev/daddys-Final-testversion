@@ -5951,6 +5951,9 @@
         $("#item_modal .section3_new_single").prepend(modifiers_single);
         $("#item_modal").addClass("active");
         $(".pos__modal__overlay").fadeIn(200);
+        setTimeout(function () {
+            setItemInputTarget($("#modal_item_note"), "Note");
+        }, 100);
     }
     //when single ite is clicked pop-up modal is appeared
     function openProductEditModalForPromo(string_text, item_name, id, promo_type, discount, get_food_menu_id, qty, get_qty, item_price, modal_item_name_row) {
@@ -6079,6 +6082,9 @@
 
         $("#item_modal").addClass("active");
         $(".pos__modal__overlay").fadeIn(200);
+        setTimeout(function () {
+            setItemInputTarget($("#modal_item_note"), "Note");
+        }, 100);
     }
     //when single ite is clicked pop-up modal is appeared
     $(document).on("click", ".single_item", function () {
@@ -6914,6 +6920,9 @@
 
         $("#item_modal").addClass("active");
         $(".pos__modal__overlay").fadeIn(200);
+        setTimeout(function () {
+            setItemInputTarget($("#modal_item_note"), "Note");
+        }, 100);
     });
     $(document).on("click", "#close_item_modal", function (e) {
         reset_on_modal_close_or_add_to_cart();
@@ -7580,8 +7589,372 @@
 
             $("#add_customer_modal").addClass("active");
             $(".pos__modal__overlay").fadeIn(200);
+            setTimeout(function () {
+                setCustomerInputTarget($("#customer_name_modal"), "Name");
+            }, 100);
         } else {
             toastr['error']((menu_not_permit_access + "!"), '');
+        }
+    });
+
+    // -------------------------------------------------------------
+    // Add Customer Modal: Touch Dual Keyboard (Numpad & QWERTY)
+    // -------------------------------------------------------------
+    let currentCustomerInputTarget = $("#customer_name_modal");
+    let customerKeyboardMode = "qwerty";
+    let customerShiftActive = true;
+
+    function setCustomerKeyboardMode(mode) {
+        customerKeyboardMode = mode;
+        if (mode === "qwerty") {
+            $(".customer_numeric_layout").hide();
+            $(".customer_qwerty_layout").show();
+            $(".btn_kb_switch").removeClass("active");
+            $(".btn_kb_switch[data-mode='qwerty']").addClass("active");
+        } else {
+            $(".customer_qwerty_layout").hide();
+            $(".customer_numeric_layout").show();
+            $(".btn_kb_switch").removeClass("active");
+            $(".btn_kb_switch[data-mode='num']").addClass("active");
+        }
+    }
+
+    function setCustomerShift(active) {
+        customerShiftActive = active;
+        if (active) {
+            $(".btn_cust_shift").addClass("active");
+            $(".btn_alpha_key").each(function () {
+                let ch = $(this).attr("data-char");
+                $(this).text(ch ? ch.toUpperCase() : "");
+            });
+        } else {
+            $(".btn_cust_shift").removeClass("active");
+            $(".btn_alpha_key").each(function () {
+                let ch = $(this).attr("data-char");
+                $(this).text(ch ? ch.toLowerCase() : "");
+            });
+        }
+    }
+
+    function setCustomerInputTarget($target, label) {
+        if (!$target || !$target.length) {
+            $target = $("#customer_name_modal");
+        }
+        currentCustomerInputTarget = $target;
+
+        $("#add_customer_modal .add_customer_modal_input, #add_customer_modal textarea").removeClass("numpad_active_input");
+        $target.addClass("numpad_active_input");
+
+        let id = $target.attr("id");
+        if (!label) {
+            if (id === "customer_name_modal") label = "Name";
+            else if (id === "customer_phone_modal") label = "Phone";
+            else if (id === "customer_email_modal") label = "Email";
+            else if (id === "customer_dob_modal") label = "DOB";
+            else if (id === "customer_doa_modal") label = "Anniversary";
+            else if (id === "customer_default_discount_modal") label = "Discount";
+            else if (id === "customer_delivery_address_modal") label = "Address";
+            else if (id === "customer_gst_number_modal") label = "GST";
+            else label = "Input";
+        }
+        $("#customer_numpad_target_badge").text(label);
+
+        $(".btn_quick_field").removeClass("active");
+        $(".btn_quick_field[data-target='" + id + "']").addClass("active");
+
+        // Auto-switch keyboard mode based on input type
+        if (id === "customer_name_modal" || id === "customer_email_modal" || id === "customer_delivery_address_modal") {
+            setCustomerKeyboardMode("qwerty");
+            if (id === "customer_name_modal" && !$target.val()) {
+                setCustomerShift(true);
+            }
+        } else if (id === "customer_phone_modal" || id === "customer_dob_modal" || id === "customer_doa_modal" || id === "customer_default_discount_modal") {
+            setCustomerKeyboardMode("num");
+        }
+    }
+
+    // Switch mode button click (123 / ABC header toggle)
+    $(document).on("click", ".btn_kb_switch", function (e) {
+        e.preventDefault();
+        let mode = $(this).attr("data-mode");
+        setCustomerKeyboardMode(mode);
+    });
+
+    // 123 button inside QWERTY layout
+    $(document).on("click", ".btn_cust_switch_num", function (e) {
+        e.preventDefault();
+        setCustomerKeyboardMode("num");
+    });
+
+    // Shift / Caps toggle
+    $(document).on("click", ".btn_cust_shift", function (e) {
+        e.preventDefault();
+        setCustomerShift(!customerShiftActive);
+    });
+
+    // Track active target on focus or click
+    $(document).on("focus click", "#add_customer_modal .add_customer_modal_input, #add_customer_modal textarea", function () {
+        setCustomerInputTarget($(this));
+    });
+
+    // Quick field buttons click
+    $(document).on("click", ".btn_quick_field", function (e) {
+        e.preventDefault();
+        let targetId = $(this).attr("data-target");
+        let $target = $("#" + targetId);
+        if ($target.length) {
+            $target.focus();
+            setCustomerInputTarget($target);
+        }
+    });
+
+    // Unified Key handling (Alpha, Numeric, Symbols, Backspace, Clear, Space)
+    $(document).on("click", ".btn_cust_key", function (e) {
+        e.preventDefault();
+        if (!currentCustomerInputTarget || !currentCustomerInputTarget.length) {
+            currentCustomerInputTarget = $("#customer_name_modal");
+        }
+
+        let $input = currentCustomerInputTarget;
+        let el = $input[0];
+        let val = $input.val() || "";
+        let action = $(this).attr("data-action");
+        let dataVal = $(this).attr("data-val");
+        let dataChar = $(this).attr("data-char");
+
+        // Action: Clear
+        if (action === "clear") {
+            $input.val("");
+            $input.trigger("input").trigger("change");
+            return;
+        }
+
+        // Action: Backspace
+        if (action === "backspace") {
+            if (el && typeof el.selectionStart === "number" && typeof el.selectionEnd === "number" && el.selectionStart !== el.selectionEnd) {
+                let start = el.selectionStart;
+                let end = el.selectionEnd;
+                $input.val(val.slice(0, start) + val.slice(end));
+                if (el.setSelectionRange) el.setSelectionRange(start, start);
+            } else if (val.length > 0) {
+                let cursorPos = (el && typeof el.selectionStart === "number") ? el.selectionStart : val.length;
+                if (cursorPos > 0) {
+                    let newVal = val.slice(0, cursorPos - 1) + val.slice(cursorPos);
+                    $input.val(newVal);
+                    if (el && el.setSelectionRange) {
+                        el.setSelectionRange(cursorPos - 1, cursorPos - 1);
+                    }
+                } else {
+                    $input.val(val.slice(0, -1));
+                }
+            }
+            $input.trigger("input").trigger("change");
+            return;
+        }
+
+        // Action: Space
+        if (action === "space") {
+            insertTextAtCursor($input, " ");
+            if ($input.attr("id") === "customer_name_modal") {
+                setCustomerShift(true); // Capitalize next word
+            }
+            return;
+        }
+
+        // Letter Keys (QWERTY)
+        if (dataChar) {
+            let charToInsert = customerShiftActive ? dataChar.toUpperCase() : dataChar.toLowerCase();
+            insertTextAtCursor($input, charToInsert);
+
+            // Auto-uncapitalize after first letter of a word in Name
+            if ($input.attr("id") === "customer_name_modal" && customerShiftActive) {
+                setCustomerShift(false);
+            }
+            return;
+        }
+
+        // Numeric or Symbol Keys (+94, digits, +, ., @)
+        if (dataVal) {
+            if (dataVal === "+94") {
+                if (!val) {
+                    $input.val("+94");
+                } else if (!val.startsWith("+94")) {
+                    $input.val("+94" + val.replace(/^\+?94?/, ''));
+                }
+                $input.trigger("input").trigger("change");
+            } else {
+                insertTextAtCursor($input, dataVal);
+            }
+        }
+    });
+
+    function insertTextAtCursor($input, text) {
+        let el = $input[0];
+        let val = $input.val() || "";
+        if (el && typeof el.selectionStart === "number") {
+            let start = el.selectionStart;
+            let end = el.selectionEnd;
+            let newVal = val.slice(0, start) + text + val.slice(end);
+            $input.val(newVal);
+            if (el.setSelectionRange) {
+                el.setSelectionRange(start + text.length, start + text.length);
+            }
+        } else {
+            $input.val(val + text);
+        }
+        $input.trigger("input").trigger("change");
+    }
+
+    // -------------------------------------------------------------
+    // Item Modal: Touch Dual Keyboard (QWERTY & Numeric)
+    // -------------------------------------------------------------
+    let currentItemInputTarget = $("#modal_item_note");
+    let itemKeyboardMode = "qwerty";
+    let itemShiftActive = false;
+
+    function setItemKeyboardMode(mode) {
+        itemKeyboardMode = mode;
+        if (mode === "qwerty") {
+            $(".item_numeric_layout").hide();
+            $(".item_qwerty_layout").show();
+            $(".btn_item_kb_switch").removeClass("active");
+            $(".btn_item_kb_switch[data-mode='qwerty']").addClass("active");
+        } else {
+            $(".item_qwerty_layout").hide();
+            $(".item_numeric_layout").show();
+            $(".btn_item_kb_switch").removeClass("active");
+            $(".btn_item_kb_switch[data-mode='num']").addClass("active");
+        }
+    }
+
+    function setItemShift(active) {
+        itemShiftActive = active;
+        if (active) {
+            $(".btn_item_shift").addClass("active");
+            $(".item_qwerty_layout .btn_alpha_key").each(function () {
+                let ch = $(this).attr("data-char");
+                $(this).text(ch ? ch.toUpperCase() : "");
+            });
+        } else {
+            $(".btn_item_shift").removeClass("active");
+            $(".item_qwerty_layout .btn_alpha_key").each(function () {
+                let ch = $(this).attr("data-char");
+                $(this).text(ch ? ch.toLowerCase() : "");
+            });
+        }
+    }
+
+    function setItemInputTarget($target, label) {
+        if (!$target || !$target.length) {
+            $target = $("#modal_item_note");
+        }
+        currentItemInputTarget = $target;
+
+        $("#item_modal input, #item_modal textarea").removeClass("item_kb_active");
+        $target.addClass("item_kb_active");
+
+        let id = $target.attr("id");
+        if (!label) {
+            if (id === "modal_item_note") label = "Note";
+            else if (id === "modal_discount") label = "Discount";
+            else if (id === "item_quantity_modal") label = "Qty";
+            else if (id === "item_modal_cust_phone") label = "Phone";
+            else if (id === "item_modal_cust_name") label = "Cust Name";
+            else if (id === "item_modal_cust_address") label = "Cust Address";
+            else label = "Input";
+        }
+        $("#item_keyboard_target_badge").text(label);
+
+        // Auto-switch keyboard layout based on input field
+        if (id === "modal_discount" || id === "item_quantity_modal" || id === "item_modal_cust_phone") {
+            setItemKeyboardMode("num");
+        } else {
+            setItemKeyboardMode("qwerty");
+        }
+    }
+
+    // Switch mode buttons in Item Modal (ABC / 123)
+    $(document).on("click", ".btn_item_kb_switch", function (e) {
+        e.preventDefault();
+        setItemKeyboardMode($(this).attr("data-mode"));
+    });
+
+    $(document).on("click", ".btn_item_switch_num", function (e) {
+        e.preventDefault();
+        setItemKeyboardMode("num");
+    });
+
+    $(document).on("click", ".btn_item_switch_alpha", function (e) {
+        e.preventDefault();
+        setItemKeyboardMode("qwerty");
+    });
+
+    // Shift toggle in Item Modal
+    $(document).on("click", ".btn_item_shift", function (e) {
+        e.preventDefault();
+        setItemShift(!itemShiftActive);
+    });
+
+    // Track active target on focus/click inside Item Modal
+    $(document).on("focus click", "#modal_item_note, #modal_discount, #item_quantity_modal, #item_modal_cust_phone, #item_modal_cust_name, #item_modal_cust_address", function () {
+        setItemInputTarget($(this));
+    });
+
+    // Key presses in Item Modal
+    $(document).on("click", ".btn_item_key", function (e) {
+        e.preventDefault();
+        if (!currentItemInputTarget || !currentItemInputTarget.length) {
+            currentItemInputTarget = $("#modal_item_note");
+        }
+
+        let $input = currentItemInputTarget;
+        let el = $input[0];
+        let val = $input.val() || "";
+        let action = $(this).attr("data-action");
+        let dataVal = $(this).attr("data-val");
+        let dataChar = $(this).attr("data-char");
+
+        if (action === "clear") {
+            $input.val("");
+            $input.trigger("input").trigger("change");
+            return;
+        }
+
+        if (action === "backspace") {
+            if (el && typeof el.selectionStart === "number" && typeof el.selectionEnd === "number" && el.selectionStart !== el.selectionEnd) {
+                let start = el.selectionStart;
+                let end = el.selectionEnd;
+                $input.val(val.slice(0, start) + val.slice(end));
+                if (el.setSelectionRange) el.setSelectionRange(start, start);
+            } else if (val.length > 0) {
+                let cursorPos = (el && typeof el.selectionStart === "number") ? el.selectionStart : val.length;
+                if (cursorPos > 0) {
+                    let newVal = val.slice(0, cursorPos - 1) + val.slice(cursorPos);
+                    $input.val(newVal);
+                    if (el && el.setSelectionRange) {
+                        el.setSelectionRange(cursorPos - 1, cursorPos - 1);
+                    }
+                } else {
+                    $input.val(val.slice(0, -1));
+                }
+            }
+            $input.trigger("input").trigger("change");
+            return;
+        }
+
+        if (action === "space") {
+            insertTextAtCursor($input, " ");
+            return;
+        }
+
+        if (dataChar) {
+            let charToInsert = itemShiftActive ? dataChar.toUpperCase() : dataChar.toLowerCase();
+            insertTextAtCursor($input, charToInsert);
+            return;
+        }
+
+        if (dataVal) {
+            insertTextAtCursor($input, dataVal);
         }
     });
 
@@ -16955,6 +17328,9 @@
                 response = JSON.parse(response);
                 $("#add_customer_modal").addClass("active");
                 $(".pos__modal__overlay").fadeIn(200);
+                setTimeout(function () {
+                    setCustomerInputTarget($("#customer_name_modal"), "Name");
+                }, 100);
 
                 $("#customer_id_modal").val(response.id);
                 $("#customer_name_modal").val(response.name);

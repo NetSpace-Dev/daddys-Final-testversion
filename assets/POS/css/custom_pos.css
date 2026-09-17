@@ -358,4 +358,452 @@
         flex: 0 0 18% !important;
         width: 18% !important;
     }
+}
+
+/* ==========================================================================
+   ADD CUSTOMER MODAL - TOUCH NUMPAD & QWERTY DUAL KEYBOARD LAYOUT
+   ========================================================================== */
+
+#add_customer_modal {
+    max-width: 980px !important;
+    width: 96vw !important;
+}
+
+#add_customer_modal #editCustomer1 {
+    max-width: 100% !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.customer_modal_body_flex {
+    display: flex !important;
+    gap: 15px !important;
+    align-items: stretch !important;
+    padding: 4px 10px !important;
+    box-sizing: border-box !important;
+}
+
+.customer_modal_fields_col {
+    flex: 1 1 50% !important;
+    min-width: 0 !important;
+}
+
+.customer_modal_fields_col .customer_add_modal_info_holder {
+    padding: 0 !important;
+}
+
+.customer_modal_numpad_col {
+    flex: 0 0 48% !important;
+    min-width: 350px !important;
+    max-width: 460px !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.customer_numpad_wrapper {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    box-sizing: border-box;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.customer_numpad_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+/* Segmented mode switcher (123 / ABC) */
+.keyboard_mode_switch {
+    display: flex;
+    background: #e2e8f0;
+    border-radius: 6px;
+    padding: 2px;
+    gap: 2px;
+}
+
+.keyboard_mode_switch .btn_kb_switch {
+    border: none;
+    background: transparent;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #475569;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.keyboard_mode_switch .btn_kb_switch.active {
+    background: #ffffff;
+    color: #0284c7;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.customer_numpad_header .numpad_target_badge {
+    background: #0284c7;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 12px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    box-shadow: 0 1px 2px rgba(2, 132, 199, 0.3);
+}
+
+.customer_numpad_quick_fields {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.customer_numpad_quick_fields .btn_quick_field {
+    flex: 1;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 6px 3px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    white-space: nowrap;
+}
+
+.customer_numpad_quick_fields .btn_quick_field:hover {
+    background: #f1f5f9;
+    border-color: #94a3b8;
+    color: #1e293b;
+}
+
+.customer_numpad_quick_fields .btn_quick_field.active {
+    background: #e0f2fe;
+    border-color: #0284c7;
+    color: #0369a1;
+    box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.2);
+    font-weight: 700;
+}
+
+/* Base Key Style */
+.btn_cust_key {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.1s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    user-select: none;
+    -webkit-user-select: none;
+    box-sizing: border-box;
+}
+
+.btn_cust_key:hover {
+    background: #f8fafc;
+    border-color: #94a3b8;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+}
+
+.btn_cust_key:active {
+    background: #e2e8f0;
+    transform: translateY(1px);
+    box-shadow: none;
+}
+
+/* Numeric Layout Grid */
+.customer_numpad_grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    flex: 1;
+}
+
+.btn_num_key {
+    font-size: 21px;
+    font-weight: 700;
+    color: #1e293b;
+    min-height: 48px;
+}
+
+.btn_cust_func {
+    background: #f1f5f9;
+    color: #334155;
+    font-size: 19px;
+}
+
+.btn_cust_country {
+    background: #ecfdf5;
+    color: #047857;
+    border-color: #a7f3d0;
+    font-size: 15px;
+    font-weight: 700;
+}
+.btn_cust_country:hover {
+    background: #d1fae5;
+    border-color: #6ee7b7;
+}
+
+.btn_cust_backspace {
+    background: #fff7ed;
+    color: #c2410c;
+    border-color: #fed7aa;
+    font-size: 16px;
+}
+.btn_cust_backspace:hover {
+    background: #ffedd5;
+    border-color: #fdba74;
+}
+
+.btn_cust_clear {
+    background: #fef2f2;
+    color: #b91c1c;
+    border-color: #fecaca;
+    font-size: 15px;
+    font-weight: 700;
+}
+.btn_cust_clear:hover {
+    background: #fee2e2;
+    border-color: #fca5a5;
+}
+
+/* QWERTY Layout Rows */
+.customer_qwerty_layout {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+    justify-content: center;
+}
+
+.qwerty_row {
+    display: flex;
+    gap: 4px;
+    width: 100%;
+}
+
+.btn_alpha_key {
+    flex: 1;
+    min-width: 0;
+    min-height: 42px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1e293b;
+    padding: 0;
+}
+
+.qwerty_row_2 {
+    padding: 0 10px;
+}
+
+.btn_cust_shift {
+    flex: 1.25;
+    min-height: 42px;
+    background: #f1f5f9;
+    color: #475569;
+    font-size: 15px;
+}
+
+.btn_cust_shift.active {
+    background: #0284c7;
+    color: #ffffff;
+    border-color: #0284c7;
+    box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.25);
+}
+
+.qwerty_row_3 .btn_cust_backspace {
+    flex: 1.25;
+    min-height: 42px;
+}
+
+.btn_cust_switch_num {
+    flex: 1.25;
+    min-height: 42px;
+    background: #f1f5f9;
+    color: #334155;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.btn_symbol_key {
+    flex: 1;
+    min-height: 42px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.btn_cust_space {
+    flex: 3.5;
+    min-height: 42px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #64748b;
+    background: #f8fafc;
+}
+
+.qwerty_row_4 .btn_cust_clear {
+    flex: 1;
+    min-height: 42px;
+}
+
+/* Active focus indicator for selected customer input */
+.add_customer_modal_input.numpad_active_input,
+#customer_delivery_address_modal.numpad_active_input {
+    border-color: #0284c7 !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.25) !important;
+}
+
+@media (max-width: 860px) {
+    .customer_modal_body_flex {
+        flex-direction: column !important;
+    }
+    .customer_modal_numpad_col {
+        max-width: 100% !important;
+        flex: 1 1 auto !important;
+        margin-top: 10px !important;
+    }
+}
+
+/* ==========================================================================
+   ITEM MODAL - TOUCH DUAL KEYBOARD (QWERTY & NUMERIC)
+   ========================================================================== */
+
+#item_modal {
+    max-width: 720px !important;
+    width: 95vw !important;
+}
+
+#item_modal .modal-content {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 10px 16px !important;
+}
+
+#item_modal #modal_item_note {
+    height: 42px !important;
+    min-height: 42px !important;
+    max-height: 52px !important;
+    font-size: 14px !important;
+    padding: 6px 10px !important;
+    margin-bottom: 8px !important;
+    box-sizing: border-box !important;
+    resize: none !important;
+}
+
+.item_modal_keyboard_wrapper {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 8px 10px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.item_keyboard_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.item_kb_mode_switch .btn_item_kb_switch {
+    border: none;
+    background: transparent;
+    padding: 3px 12px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #475569;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.item_kb_mode_switch .btn_item_kb_switch.active {
+    background: #ffffff;
+    color: #0284c7;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.item_keyboard_target_badge {
+    background: #0284c7;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 12px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.item_keyboard_layout {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.btn_item_key {
+    min-height: 38px !important;
+    font-size: 15px !important;
+}
+
+.item_num_row_1,
+.item_num_row_2 {
+    display: flex;
+    gap: 4px;
+    width: 100%;
+}
+
+.item_num_row_1 .btn_num_key {
+    flex: 1;
+    min-height: 40px !important;
+    font-size: 18px !important;
+    font-weight: 700 !important;
+}
+
+.item_num_row_2 .btn_item_key {
+    min-height: 40px !important;
+}
+
+.item_num_row_2 .btn_item_switch_alpha {
+    flex: 1.5;
+    background: #f1f5f9;
+    font-weight: 700;
+    font-size: 13px;
+    color: #334155;
+}
+
+.item_num_row_2 .btn_cust_space {
+    flex: 3;
+}
+
+/* Active ring on item modal inputs */
+#modal_item_note.item_kb_active,
+#modal_discount.item_kb_active,
+#item_quantity_modal.item_kb_active,
+#item_modal_cust_phone.item_kb_active,
+#item_modal_cust_name.item_kb_active,
+#item_modal_cust_address.item_kb_active {
+    border-color: #0284c7 !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.25) !important;
 }
