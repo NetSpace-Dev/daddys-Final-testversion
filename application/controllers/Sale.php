@@ -3416,6 +3416,9 @@ We hope to see you again!";
      * @param int
      */
     public function delete_specific_order_by_sale_id($sale_id){
+        $sale_obj = $this->db->get_where('tbl_sales', array('id' => $sale_id))->row();
+        $target_sale_no = ($sale_obj && !empty($sale_obj->sale_no)) ? $sale_obj->sale_no : '';
+
         $this->db->delete('tbl_sales', array('id' => $sale_id));
         $this->db->delete('tbl_sales_details', array('sales_id' => $sale_id));
         $this->db->delete('tbl_sale_payments', array('sale_id' => $sale_id));
@@ -3424,6 +3427,12 @@ We hope to see you again!";
         $this->db->delete('tbl_sale_consumptions_of_menus', array('sales_id' => $sale_id));
         $this->db->delete('tbl_sale_consumptions_of_modifiers_of_menus', array('sales_id' => $sale_id));
         $this->db->delete('tbl_orders_table', array('sale_id' => $sale_id));
+        if ($target_sale_no) {
+            $this->db->delete('tbl_running_order_tables', array('sale_no' => $target_sale_no));
+            $this->db->delete('tbl_orders_table', array('sale_no' => $target_sale_no));
+            $this->db->delete('tbl_kitchen_sales', array('sale_no' => $target_sale_no));
+            $this->db->delete('tbl_kitchen_sales_details', array('sales_id' => $sale_id));
+        }
         return true;
     }
      /**

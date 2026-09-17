@@ -137,6 +137,7 @@
     let role = $("base[data-role]").attr("data-role");
     let collect_gst = $("base[data-collect-gst]").attr("data-collect-gst");
     let skip_invoice_print = 0;
+    let consecutivePollFailures = 0;
 
     let s_height = Number($(window).height());
     let s_width = Number($(window).width());

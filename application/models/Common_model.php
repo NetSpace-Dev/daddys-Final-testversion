@@ -1417,15 +1417,25 @@ class Common_model extends CI_Model {
     public function getOrderedTable() {
         $outlet_id = $this->session->userdata('outlet_id');
         
-        // 1. Clean up table reservations where the sale has been finalized (order_status=3 in tbl_sales)
+        // 1. Clean up table reservations where the sale has been finalized (order_status=3) or marked deleted
         $this->db->query("DELETE FROM `tbl_running_order_tables` 
             WHERE del_status='Live' 
             AND outlet_id='$outlet_id' 
             AND sale_no IN (
-                SELECT sale_no FROM `tbl_sales` WHERE del_status='Live' AND outlet_id='$outlet_id' AND order_status=3
+                SELECT sale_no FROM `tbl_sales` WHERE outlet_id='$outlet_id' AND (order_status=3 OR del_status='Deleted')
             )");
 
-        // 2. Clean up table reservations from previous days (older than yesterday)
+        // 2. Clean up orphaned table reservations where the sale does NOT exist in active tbl_sales or tbl_kitchen_sales
+        $this->db->query("DELETE FROM `tbl_running_order_tables` 
+            WHERE del_status='Live' 
+            AND outlet_id='$outlet_id' 
+            AND sale_no NOT IN (
+                SELECT sale_no FROM `tbl_sales` WHERE del_status='Live' AND outlet_id='$outlet_id' AND (order_status=1 OR order_status=2)
+                UNION
+                SELECT sale_no FROM `tbl_kitchen_sales` WHERE del_status='Live' AND outlet_id='$outlet_id'
+            )");
+
+        // 3. Clean up table reservations from previous days (older than yesterday)
         $today = date('ymd');
         $yesterday = date('ymd', strtotime('-1 day'));
         $this->db->query("DELETE FROM `tbl_running_order_tables` 
@@ -1434,18 +1444,29 @@ class Common_model extends CI_Model {
             AND sale_no NOT LIKE '%$today%' 
             AND sale_no NOT LIKE '%$yesterday%'");
 
-        // 3. Select active table assignments from tbl_running_order_tables and tbl_orders_table for non-finalized running sales
+        // 4. Select active table assignments for strictly active, non-finalized running sales
         $query_str = "SELECT rot.table_id, rot.sale_no, rot.persons 
                       FROM `tbl_running_order_tables` rot
                       WHERE rot.del_status='Live' AND rot.outlet_id='$outlet_id'
-                      AND rot.sale_no NOT IN (
-                          SELECT sale_no FROM `tbl_sales` WHERE del_status='Live' AND outlet_id='$outlet_id' AND order_status=3
+                      AND (
+                          rot.sale_no IN (
+                              SELECT sale_no FROM `tbl_sales` 
+                              WHERE del_status='Live' AND outlet_id='$outlet_id' AND (order_status=1 OR order_status=2)
+                          )
+                          OR
+                          rot.sale_no IN (
+                              SELECT sale_no FROM `tbl_kitchen_sales` 
+                              WHERE del_status='Live' AND outlet_id='$outlet_id'
+                              AND sale_no NOT IN (
+                                  SELECT sale_no FROM `tbl_sales` WHERE del_status='Live' AND outlet_id='$outlet_id' AND order_status=3
+                              )
+                          )
                       )
                       UNION
                       SELECT ot.table_id, s.sale_no, ot.persons 
                       FROM `tbl_orders_table` ot
                       JOIN `tbl_sales` s ON (s.id = ot.sale_id OR s.sale_no = ot.sale_no)
-                      WHERE ot.del_status='Live' AND s.del_status='Live' AND s.outlet_id='$outlet_id' AND s.order_status != 3
+                      WHERE ot.del_status='Live' AND s.del_status='Live' AND s.outlet_id='$outlet_id' AND (s.order_status = 1 OR s.order_status = 2)
                       UNION
                       SELECT ot.table_id, ks.sale_no, ot.persons 
                       FROM `tbl_orders_table` ot
