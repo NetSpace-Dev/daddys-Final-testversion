@@ -12,16 +12,8 @@
     margin-bottom: 5px !important;
 }
 
-@media (max-width: 767px) {
-    .order_table_holder .order_holder .single_order .single_order_column .fa-pencil-alt {
-        font-size: 30px !important;
-    }
-}
-
-@media (max-width: 1301px) and (min-width: 768px) {
-    .order_table_holder .order_holder .single_order .single_order_column .fa-pencil-alt {
-        font-size: 30px !important;
-    }
+.order_table_holder .order_holder .single_order .single_order_column .fa-pencil-alt {
+    font-size: 13px !important;
 }
 
 .logout_btn_online_order_css {
@@ -126,3 +118,244 @@
 .inside_single_order_container.active {
     height: 100% !important;
 }
+
+/* ==========================================================================
+   CART TABLE RESPONSIVE ALIGNMENT & COMPACT LAYOUT
+   ========================================================================== */
+
+/* Header Row Flex Layout */
+.order_table_holder .order_table_header_row {
+    display: flex !important;
+    align-items: center !important;
+    width: 100% !important;
+    height: 36px !important;
+    line-height: 36px !important;
+    box-sizing: border-box !important;
+    padding: 0 4px !important;
+}
+
+.order_table_holder .order_table_header_row .single_header_column {
+    float: none !important;
+    box-sizing: border-box !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    color: #333 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
+/* Data Row Flex Layout */
+.order_table_holder .order_holder .single_order .first_portion {
+    display: flex !important;
+    align-items: center !important;
+    width: 100% !important;
+    padding: 4px 4px !important;
+    box-sizing: border-box !important;
+    border-bottom: 1px dashed #e9ecef !important;
+}
+
+.order_table_holder .order_holder .single_order .single_order_column {
+    float: none !important;
+    box-sizing: border-box !important;
+    font-size: 13px !important;
+}
+
+/* Column 1: Item */
+.order_table_holder .order_table_header_row #single_order_item,
+.order_table_holder .order_holder .single_order .first_portion .first_column {
+    flex: 1 1 35% !important;
+    width: 35% !important;
+    min-width: 0 !important;
+    text-align: left !important;
+    padding-left: 2px !important;
+    padding-right: 4px !important;
+    margin: 0 !important;
+}
+
+.order_table_holder .order_holder .single_order .first_portion .first_column {
+    display: flex !important;
+    align-items: center !important;
+    line-height: 1.25 !important;
+    word-break: break-word !important;
+}
+
+.order_table_holder .order_holder .single_order .first_portion .first_column span {
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    line-height: 1.25 !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+}
+
+.order_table_holder .order_holder .single_order .single_order_column .fa-pencil-alt {
+    font-size: 13px !important;
+    color: #6c757d !important;
+    margin-right: 6px !important;
+    flex-shrink: 0 !important;
+    cursor: pointer !important;
+    vertical-align: middle !important;
+}
+
+/* Column 2: Price */
+.order_table_holder .order_table_header_row #single_order_price,
+.order_table_holder .order_holder .single_order .first_portion .second_column {
+    flex: 0 0 15% !important;
+    width: 15% !important;
+    text-align: right !important;
+    padding-right: 6px !important;
+    margin: 0 !important;
+    white-space: nowrap !important;
+    font-size: 12px !important;
+}
+
+/* Column 3: Quantity (- 1 +) */
+.order_table_holder .order_table_header_row #single_order_qty,
+.order_table_holder .order_holder .single_order .first_portion .third_column {
+    flex: 0 0 20% !important;
+    width: 20% !important;
+    text-align: center !important;
+    margin: 0 !important;
+}
+
+.order_table_holder .order_holder .single_order .first_portion .third_column {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    white-space: nowrap !important;
+    flex-wrap: nowrap !important;
+    gap: 3px !important;
+}
+
+.order_table_holder .order_holder .single_order .third_column .fal.decrease_item_table,
+.order_table_holder .order_holder .single_order .third_column .fal.increase_item_table,
+.order_table_holder .order_holder .single_order .third_column .fal.alert_free_item_increase {
+    width: 22px !important;
+    height: 22px !important;
+    min-width: 22px !important;
+    line-height: 22px !important;
+    text-align: center !important;
+    border-radius: 4px !important;
+    padding: 0 !important;
+    font-size: 11px !important;
+    background-color: #f1f3f5 !important;
+    color: #495057 !important;
+    border: 1px solid #ced4da !important;
+    cursor: pointer !important;
+    flex-shrink: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.order_table_holder .order_holder .single_order .third_column .qty_item_custom {
+    display: inline-block !important;
+    width: auto !important;
+    min-width: 16px !important;
+    text-align: center !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    flex-shrink: 0 !important;
+    margin: 0 2px !important;
+}
+
+/* Column 4: Discount */
+.order_table_holder .order_table_header_row #single_order_discount,
+.order_table_holder .order_holder .single_order .first_portion .forth_column {
+    flex: 0 0 13% !important;
+    width: 13% !important;
+    text-align: center !important;
+    margin: 0 !important;
+}
+
+.order_table_holder .order_holder .single_order .first_portion .forth_column {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.order_table_holder .order_holder .single_order .forth_column .discount_cart_input {
+    width: 32px !important;
+    height: 22px !important;
+    line-height: 22px !important;
+    font-size: 11px !important;
+    border-radius: 4px !important;
+    border: 1px solid #ced4da !important;
+    background: #f8f9fa !important;
+    color: #495057 !important;
+    text-align: center !important;
+    padding: 0 !important;
+    cursor: pointer !important;
+}
+
+/* Column 5: Total + Remove Button */
+.order_table_holder .order_table_header_row #single_order_total,
+.order_table_holder .order_holder .single_order .first_portion .fifth_column {
+    flex: 0 0 17% !important;
+    width: 17% !important;
+    text-align: right !important;
+    margin: 0 !important;
+    white-space: nowrap !important;
+}
+
+.order_table_holder .order_holder .single_order .first_portion .fifth_column {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 4px !important;
+    position: relative !important;
+    padding-right: 2px !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+}
+
+.order_table_holder .order_holder .single_order .fifth_column .removeCartItem,
+.order_table_holder .order_holder .single_order .fifth_column .removeCartItemFree {
+    position: static !important;
+    width: 18px !important;
+    height: 18px !important;
+    min-width: 18px !important;
+    line-height: 18px !important;
+    border-radius: 50% !important;
+    text-align: center !important;
+    font-size: 10px !important;
+    background-color: #e63946 !important;
+    color: #ffffff !important;
+    cursor: pointer !important;
+    flex-shrink: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* Responsive adjustments for medium/small screens */
+@media (max-width: 1300px) {
+    .order_table_holder .order_table_header_row #single_order_item,
+    .order_table_holder .order_holder .single_order .first_portion .first_column {
+        flex: 1 1 33% !important;
+        width: 33% !important;
+    }
+    .order_table_holder .order_table_header_row #single_order_price,
+    .order_table_holder .order_holder .single_order .first_portion .second_column {
+        flex: 0 0 16% !important;
+        width: 16% !important;
+    }
+    .order_table_holder .order_table_header_row #single_order_qty,
+    .order_table_holder .order_holder .single_order .first_portion .third_column {
+        flex: 0 0 22% !important;
+        width: 22% !important;
+    }
+    .order_table_holder .order_table_header_row #single_order_discount,
+    .order_table_holder .order_holder .single_order .first_portion .forth_column {
+        flex: 0 0 11% !important;
+        width: 11% !important;
+    }
+    .order_table_holder .order_table_header_row #single_order_total,
+    .order_table_holder .order_holder .single_order .first_portion .fifth_column {
+        flex: 0 0 18% !important;
+        width: 18% !important;
+    }
+}
