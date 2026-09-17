@@ -1465,37 +1465,6 @@
     function loadAllTableStates(retryCount) {
         if (typeof retryCount === 'undefined') retryCount = 1;
         let token = ++currentTableLoadToken;
-        // Clear all previously appended running order rows in tables
-        $(".old_added_table").remove();
-
-        // Reset all table cards to Free (Green) class unless they have unsaved bookings
-        $(".single_order_table").each(function () {
-            let table_id = Number($(this).attr('id').substr(25));
-            let has_new_booking = $("#single_table_order_details_top_" + table_id + " .single_row.new_book_to_table").length > 0;
-
-            if (!has_new_booking) {
-                $(this).removeClass("table-occupied").addClass("table-free").attr("data-status", "free");
-                let sit_capacity_number = Number($("#sit_capacity_number_" + table_id).text());
-                $("#sit_available_number_" + table_id).text(sit_capacity_number);
-                $(this).find(".table_image").attr("src", base_url + "images/table_icon2.png");
-            } else {
-                $(this).removeClass("table-free").addClass("table-occupied").attr("data-status", "occupied");
-
-                // Calculate available seats taking new bookings into account
-                let sit_capacity_number = Number($("#sit_capacity_number_" + table_id).text());
-                let total_persons = 0;
-                $("#single_table_order_details_top_" + table_id + " .new_book_to_table .third_column").each(function () {
-                    total_persons += Number($(this).text());
-                });
-                $("#sit_available_number_" + table_id).text(sit_capacity_number - total_persons);
-                let new_available = sit_capacity_number - total_persons;
-                if (new_available) {
-                    $(this).find(".table_image").attr("src", base_url + "images/single_booked.png");
-                } else {
-                    $(this).find(".table_image").attr("src", base_url + "images/full_booked.png");
-                }
-            }
-        });
 
         $.ajax({
             url: base_url + "Sale/getOrderedTable",
@@ -1506,161 +1475,31 @@
             },
             success: function (response) {
                 if (token !== currentTableLoadToken) return;
+
+                // 1. Collect active orders per table from server response
+                let active_table_orders = {}; // table_id => [{sale_no, persons}, ...]
                 let active_sale_nos = [];
+
                 if (response) {
-                    let table_details = JSON.parse(response);
+                    let table_details = typeof response === "string" ? JSON.parse(response) : response;
                     for (let key in table_details) {
-                        if (token !== currentTableLoadToken) return;
-                        active_sale_nos.push(table_details[key].sale_no);
-                        let person = Number(table_details[key].persons);
-                        let table_id = Number(table_details[key].table_id);
-                        let order_number = table_details[key].sale_no;
+                        let item = table_details[key];
+                        let t_id = Number(item.table_id);
+                        let s_no = item.sale_no;
+                        let persons = Number(item.persons);
+                        active_sale_nos.push(s_no);
 
-                        // Check if this specific order is already listed under this table to prevent duplication
-                        let is_already_listed = false;
-                        $(".new_order_table_" + table_id).each(function () {
-                            if ($(this).find('.first_column').text().trim() == order_number) {
-                                is_already_listed = true;
-                            }
-                        });
-                        if (is_already_listed) continue;
-
-                        let selected_order_no = $(".holder .order_details .single_order[data-selected=selected]").find(".running_order_order_number").text();
-                        let txt_new_class = '';
-                        let update_sale_id = Number($("#update_sale_id").val());
-                        if ((selected_order_no == order_number) && update_sale_id) {
-                            txt_new_class = "new_book_to_table";
+                        if (!active_table_orders[t_id]) {
+                            active_table_orders[t_id] = [];
                         }
-
-                        let table_name = $("#sit_name_" + table_id).text();
-                        let table_book_row = "";
-                        table_book_row +=
-                            '<div class="single_row old_added_table new_order_table_' + table_id + ' ' + txt_new_class + '" data-name="' + table_name + '" id="new_order_table_' +
-                            table_id +
-                            '">';
-                        table_book_row +=
-                            '<div class="floatleft fix column first_column">' +
-                            order_number +
-                            "</div>";
-                        table_book_row += '<div class="floatleft fix column second_column">-</div>';
-                        table_book_row +=
-                            '<div class="floatleft fix column third_column person_tbl_' +
-                            table_id +
-                            '">' +
-                            person +
-                            "</div>";
-                        table_book_row +=
-                            '<div class="floatleft fix column forth_column"><i class="fas fa-trash-alt remove_new_order_row_icon" id="single_row_table_delete_' +
-                            table_id +
-                            '"></i></div>';
-                        table_book_row += "</div>";
-
-                        $("#single_table_order_details_top_" + table_id).append(table_book_row);
-
-                        // Mark card as occupied (Red)
-                        let $card = $("#single_table_info_holder_" + table_id);
-                        $card.removeClass("table-free").addClass("table-occupied").attr("data-status", "occupied");
-
-                        let sit_capacity_number = Number($("#sit_capacity_number_" + table_id).text());
-                        let total_persons = 0;
-                        $(".new_order_table_" + table_id).find('.third_column').each(function () {
-                            total_persons += Number($(this).text());
+                        active_table_orders[t_id].push({
+                            sale_no: s_no,
+                            persons: persons
                         });
-                        $("#sit_available_number_" + table_id).text(sit_capacity_number - total_persons);
                     }
                 }
 
-                // Read local table reservations from IndexedDB order_tables to show offline/unsynced occupied tables
-                if (typeof db !== "undefined" && db) {
-                    try {
-                        let local_tables_transaction = db.transaction(['order_tables'], "readwrite");
-                        let local_tables_store = local_tables_transaction.objectStore("order_tables");
-                        local_tables_store.openCursor().onsuccess = function (event) {
-                            if (token !== currentTableLoadToken) return;
-                            let cursor = event.target.result;
-                            if (cursor) {
-                                let sale_id = cursor.value.sales_id || cursor.value.sale_id;
-                                let table_id = Number(cursor.value.table_id);
-                                let order_number = cursor.value.sale_no;
-                                let persons = Number(cursor.value.persons);
-
-                                // --- Parse & Validate for Safe Cleanup (Fix 2.2) ---
-                                let clean_sale_id = sale_id;
-                                if (typeof sale_id === "string" && sale_id.startsWith("srv_")) {
-                                    clean_sale_id = parseInt(sale_id.substr(4));
-                                } else {
-                                    clean_sale_id = Number(sale_id);
-                                }
-
-                                if (clean_sale_id && !active_sale_nos.includes(order_number)) {
-                                    cursor.delete();
-                                    cursor.continue();
-                                    return;
-                                }
-
-                                if (table_id) {
-                                    // Check if this specific order is already listed under this table
-                                    let is_already_listed = false;
-                                    $(".new_order_table_" + table_id).each(function () {
-                                        if ($(this).find('.first_column').text().trim() == order_number) {
-                                            is_already_listed = true;
-                                        }
-                                    });
-
-                                    if (!is_already_listed) {
-                                        let selected_order_no = $(".holder .order_details .single_order[data-selected=selected]").find(".running_order_order_number").text();
-                                        let txt_new_class = '';
-                                        let update_sale_id = Number($("#update_sale_id").val());
-                                        if ((selected_order_no == order_number) && update_sale_id) {
-                                            txt_new_class = "new_book_to_table";
-                                        }
-
-                                        let table_name = $("#sit_name_" + table_id).text();
-                                        let table_book_row = "";
-                                        table_book_row +=
-                                            '<div class="single_row old_added_table new_order_table_' + table_id + ' ' + txt_new_class + '" data-name="' + table_name + '" id="new_order_table_' +
-                                            table_id +
-                                            '">';
-                                        table_book_row +=
-                                            '<div class="floatleft fix column first_column">' +
-                                            order_number +
-                                            "</div>";
-                                        table_book_row += '<div class="floatleft fix column second_column">-</div>';
-                                        table_book_row +=
-                                            '<div class="floatleft fix column third_column person_tbl_' +
-                                            table_id +
-                                            '">' +
-                                            persons +
-                                            "</div>";
-                                        table_book_row +=
-                                            '<div class="floatleft fix column forth_column"><i class="fas fa-trash-alt remove_new_order_row_icon" id="single_row_table_delete_' +
-                                            table_id +
-                                            '"></i></div>';
-                                        table_book_row += "</div>";
-
-                                        $("#single_table_order_details_top_" + table_id).append(table_book_row);
-
-                                        // Mark card as occupied (Red)
-                                        let $card = $("#single_table_info_holder_" + table_id);
-                                        $card.removeClass("table-free").addClass("table-occupied").attr("data-status", "occupied");
-
-                                        let sit_capacity_number = Number($("#sit_capacity_number_" + table_id).text());
-                                        let total_persons = 0;
-                                        $(".new_order_table_" + table_id).find('.third_column').each(function () {
-                                            total_persons += Number($(this).text());
-                                        });
-                                        $("#sit_available_number_" + table_id).text(sit_capacity_number - total_persons);
-                                    }
-                                }
-                                cursor.continue();
-                            }
-                        };
-                    } catch (e) {
-                        console.error("IndexedDB order_tables read error: ", e);
-                    }
-                }
-
-                // --- Direct Sync with Running Orders Panel DOM Elements ---
+                // 2. Direct Sync with Running Orders Panel DOM Elements
                 $("#order_details_holder .single_order").each(function () {
                     let order_type = $(this).attr("order_type");
                     if (Number(order_type) === 1) {
@@ -1674,30 +1513,118 @@
                                 let table_id = Number($(this).attr('id').substr(25));
                                 let t_name = $("#sit_name_" + table_id).text().trim();
                                 if (table_names.includes(t_name)) {
-                                    let is_already_listed = false;
-                                    $(".new_order_table_" + table_id).each(function () {
-                                        if ($(this).find('.first_column').text().trim() == sale_no) {
-                                            is_already_listed = true;
-                                        }
-                                    });
-                                    if (!is_already_listed) {
-                                        let table_book_row = `
-                                            <div class="single_row old_added_table new_order_table_${table_id}" data-name="${t_name}" id="new_order_table_${table_id}">
-                                                <div class="floatleft fix column first_column">${sale_no}</div>
-                                                <div class="floatleft fix column second_column">-</div>
-                                                <div class="floatleft fix column third_column person_tbl_${table_id}">1</div>
-                                                <div class="floatleft fix column forth_column"><i class="fas fa-trash-alt remove_new_order_row_icon" id="single_row_table_delete_${table_id}"></i></div>
-                                            </div>
-                                        `;
-                                        $("#single_table_order_details_top_" + table_id).append(table_book_row);
-                                        let $card = $("#single_table_info_holder_" + table_id);
-                                        $card.removeClass("table-free").addClass("table-occupied").attr("data-status", "occupied");
+                                    if (!active_table_orders[table_id]) {
+                                        active_table_orders[table_id] = [];
+                                    }
+                                    let exists = active_table_orders[table_id].some(function (o) { return o.sale_no === sale_no; });
+                                    if (!exists) {
+                                        active_table_orders[table_id].push({
+                                            sale_no: sale_no,
+                                            persons: 1
+                                        });
                                     }
                                 }
                             });
                         }
                     }
                 });
+
+                // 3. Update each table card smoothly in-place without blinking
+                let selected_order_no = $(".holder .order_details .single_order[data-selected=selected]").find(".running_order_order_number").text().trim();
+                let update_sale_id = Number($("#update_sale_id").val());
+
+                $(".single_order_table").each(function () {
+                    let table_id = Number($(this).attr('id').substr(25));
+                    let $card = $("#single_table_info_holder_" + table_id);
+                    let $topContainer = $("#single_table_order_details_top_" + table_id);
+                    let has_new_booking = $topContainer.find(".single_row.new_book_to_table").length > 0;
+                    let sit_capacity_number = Number($("#sit_capacity_number_" + table_id).text());
+                    let orders_for_table = active_table_orders[table_id] || [];
+                    let table_name = $("#sit_name_" + table_id).text();
+
+                    if (orders_for_table.length > 0 || has_new_booking) {
+                        // Table is Occupied: Rebuild only the appended old order rows
+                        $topContainer.find(".old_added_table").remove();
+
+                        let total_persons = 0;
+                        orders_for_table.forEach(function (ord) {
+                            total_persons += ord.persons;
+                            let txt_new_class = ((selected_order_no == ord.sale_no) && update_sale_id) ? "new_book_to_table" : "";
+                            let row_html = `
+                                <div class="single_row old_added_table new_order_table_${table_id} ${txt_new_class}" data-name="${table_name}" id="new_order_table_${table_id}">
+                                    <div class="floatleft fix column first_column">${ord.sale_no}</div>
+                                    <div class="floatleft fix column second_column">-</div>
+                                    <div class="floatleft fix column third_column person_tbl_${table_id}">${ord.persons}</div>
+                                    <div class="floatleft fix column forth_column"><i class="fas fa-trash-alt remove_new_order_row_icon" id="single_row_table_delete_${table_id}"></i></div>
+                                </div>
+                            `;
+                            $topContainer.append(row_html);
+                        });
+
+                        // Calculate available seats including any unsaved bookings
+                        $topContainer.find(".new_book_to_table .third_column").each(function () {
+                            total_persons += Number($(this).text());
+                        });
+
+                        let available_seats = Math.max(0, sit_capacity_number - total_persons);
+                        $("#sit_available_number_" + table_id).text(available_seats);
+
+                        // Only change class if not already occupied to prevent flicker
+                        if (!$card.hasClass("table-occupied")) {
+                            $card.removeClass("table-free").addClass("table-occupied").attr("data-status", "occupied");
+                        }
+
+                        let target_img = available_seats > 0 ? (base_url + "images/single_booked.png") : (base_url + "images/full_booked.png");
+                        let $img = $card.find(".table_image");
+                        if ($img.attr("src") !== target_img) {
+                            $img.attr("src", target_img);
+                        }
+                    } else {
+                        // Table is Free: Clean up old rows and mark free
+                        $topContainer.find(".old_added_table").remove();
+                        $("#sit_available_number_" + table_id).text(sit_capacity_number);
+
+                        if (!$card.hasClass("table-free")) {
+                            $card.removeClass("table-occupied").addClass("table-free").attr("data-status", "free");
+                        }
+
+                        let free_img = base_url + "images/table_icon2.png";
+                        let $img = $card.find(".table_image");
+                        if ($img.attr("src") !== free_img) {
+                            $img.attr("src", free_img);
+                        }
+                    }
+                });
+
+                // 4. Read local table reservations from IndexedDB order_tables for offline cleanup
+                if (typeof db !== "undefined" && db) {
+                    try {
+                        let local_tables_transaction = db.transaction(['order_tables'], "readwrite");
+                        let local_tables_store = local_tables_transaction.objectStore("order_tables");
+                        local_tables_store.openCursor().onsuccess = function (event) {
+                            if (token !== currentTableLoadToken) return;
+                            let cursor = event.target.result;
+                            if (cursor) {
+                                let sale_id = cursor.value.sales_id || cursor.value.sale_id;
+                                let order_number = cursor.value.sale_no;
+
+                                let clean_sale_id = sale_id;
+                                if (typeof sale_id === "string" && sale_id.startsWith("srv_")) {
+                                    clean_sale_id = parseInt(sale_id.substr(4));
+                                } else {
+                                    clean_sale_id = Number(sale_id);
+                                }
+
+                                if (clean_sale_id && !active_sale_nos.includes(order_number)) {
+                                    cursor.delete();
+                                }
+                                cursor.continue();
+                            }
+                        };
+                    } catch (e) {
+                        console.error("IndexedDB order_tables read error: ", e);
+                    }
+                }
             },
             error: function (xhr, status) {
                 if (retryCount > 0 && navigator.onLine) {
