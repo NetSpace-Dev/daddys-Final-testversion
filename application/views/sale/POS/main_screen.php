@@ -991,9 +991,18 @@ if ($wl) {
 
             #add_customer_modal,
             #item_modal {
-                height: 40vh !important;
-                max-height: 40vh !important;
-                top: 30vh !important;
+                height: 55vh !important;
+                max-height: 55vh !important;
+                top: 22.5vh !important;
+            }
+
+            @media (max-width: 768px) {
+                #add_customer_modal,
+                #item_modal {
+                    height: 75vh !important;
+                    max-height: 75vh !important;
+                    top: 12.5vh !important;
+                }
             }
 
             #add_customer_modal .customer_modal_numpad_col,
