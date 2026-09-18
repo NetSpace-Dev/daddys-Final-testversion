@@ -367,9 +367,9 @@
 #add_customer_modal {
     max-width: 90vw !important;
     width: 90vw !important;
-    height: 75vh !important;
-    max-height: 75vh !important;
-    top: 12.5vh !important;
+    height: 40vh !important;
+    max-height: 40vh !important;
+    top: 30vh !important;
 }
 
 #add_customer_modal #editCustomer1 {
@@ -1145,4 +1145,51 @@
     border-color: #0284c7 !important;
     outline: none !important;
     box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.25) !important;
+}
+
+/* ==========================================================================
+   Responsive: Hide Right-Side Keyboards on Tablet & Mobile Mode
+   ========================================================================== */
+
+@media (max-width: 1200px) {
+    #add_customer_modal,
+    #item_modal {
+        height: 40vh !important;
+        max-height: 40vh !important;
+        top: 30vh !important;
+    }
+
+    #add_customer_modal .customer_modal_numpad_col,
+    #item_modal .item_modal_right_col {
+        display: none !important;
+    }
+
+    #add_customer_modal .customer_modal_fields_col,
+    #item_modal .item_modal_left_col {
+        flex: 1 1 100% !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        padding-right: 0 !important;
+    }
+
+    #add_customer_modal .customer_modal_body_flex,
+    #item_modal .item_modal_body_flex {
+        gap: 0 !important;
+    }
+}
+
+@media (max-width: 768px) {
+    #add_customer_modal,
+    #item_modal {
+        max-width: 96vw !important;
+        width: 96vw !important;
+        height: 40vh !important;
+        max-height: 40vh !important;
+        top: 30vh !important;
+    }
+
+    #add_customer_modal .customer_modal_body_flex,
+    #item_modal .item_modal_body_flex {
+        padding: 6px 10px !important;
+    }
 }

@@ -989,6 +989,31 @@ if ($wl) {
                 display: none !important;
             }
 
+            #add_customer_modal,
+            #item_modal {
+                height: 40vh !important;
+                max-height: 40vh !important;
+                top: 30vh !important;
+            }
+
+            #add_customer_modal .customer_modal_numpad_col,
+            #item_modal .item_modal_right_col {
+                display: none !important;
+            }
+
+            #add_customer_modal .customer_modal_fields_col,
+            #item_modal .item_modal_left_col {
+                flex: 1 1 100% !important;
+                max-width: 100% !important;
+                width: 100% !important;
+                padding-right: 0 !important;
+            }
+
+            #add_customer_modal .customer_modal_body_flex,
+            #item_modal .item_modal_body_flex {
+                gap: 0 !important;
+            }
+
         <?php endif;
         if ($is_self_order == "Yes" || $is_online_order == "Yes"): ?>
             #main_part .left_item .main_middle #bottom_absolute .bottom__info .main_bottom .button_group {
