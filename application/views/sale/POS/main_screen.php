@@ -530,7 +530,7 @@ if ($wl) {
     <!-- Sweet alert -->
     <script src="<?php echo base_url(); ?>assets/POS/sweetalert2/dist/sweetalert.min.js"></script>
     <link rel="stylesheet" href="<?php echo base_url(); ?>assets/POS/sweetalert2/dist/sweetalert.min.css">
-    <link rel="stylesheet" href="<?php echo base_url(); ?>assets/POS/css/custom_pos.css">
+    <link rel="stylesheet" href="<?php echo base_url(); ?>assets/POS/css/custom_pos.css?v=<?php echo time(); ?>">
     <!--notification for waiter panel-->
     <link rel="stylesheet" href="<?php echo base_url(); ?>assets/plugins/notify/jquery.notifyBar.css">
     <script type="text/javascript"
@@ -3203,162 +3203,178 @@ if ($wl) {
                     <i class="fal fa-times"></i>
                 </a>
             </h1>
-            <div class="ir_mrx5">
-                <p class="prom_txt"></p>
-                <div class="section2 fix display_none_new variation_div_modal">
-                    <div class="sec2_inside" id="sec2_1"><?php echo lang('Variation'); ?></div>
-                    <div class="sec2_inside" id="sec2_2"> <span id="vr01_modal_price_variable">0</span>
-                        <span id="vr01_modal_unit_price_variable" class="ir_display_none">0</span>
-                    </div>
-                </div>
-                <div class="section3 section3_vr fix display_none_new variation_div_modal">
-                </div>
-
-                <div class="section1 fix v_h_middle">
-                    <div class="sec1_inside" id="sec1_1"><?php echo lang('quantity'); ?></div>
-                    <div class="sec1_inside" id="sec1_2"><i class="fal fa-minus" id="decrease_item_modal"></i>
-                        <input onfocus="select();" type="text" id="item_quantity_modal" value="1"> <i
-                            class="fal fa-plus" id="increase_item_modal"></i>
-                    </div>
-                    <div class="sec1_inside" id="sec1_3"> <span id="modal_item_price_variable"
-                            class="ir_display_none">0</span><span
-                            id="modal_item_price_variable_without_discount">0</span><span id="modal_discount_amount"
-                            class="ir_display_none">0</span></div>
-
-                </div>
-
-                <div class="modifier_div section2 fix">
-                    <div class="sec2_inside" id="sec2_1"><?php echo lang('modifiers'); ?></div>
-                    <div class="sec2_inside" id="sec2_2"> <span id="modal_modifier_price_variable">0</span>
-                        <span id="modal_modifiers_unit_price_variable" class="ir_display_none">0</span>
-                    </div>
-                </div>
-
-                <div class="section3 section3_new">
-
-                </div>
-
-                <div id="modal_discount_section">
-                    <p class="ir_fl_m_font_16" id="discount_txt_focus"><?php echo lang('discount'); ?> <i
-                            data-tippy-content="<?php echo lang('txt_err_pos_6'); ?>"
-                            class="fal fa-question-circle tooltip_modifier"></i></p><input type="text" name=""
-                        onfocus="select();" <?php echo isset($waiter_app_status) && $waiter_app_status == "Yes" ? "readonly" : '' ?> id="modal_discount"
-                        class="<?php echo isset($is_discount) && $is_discount == "Yes" ? "numpad_input_" : '' ?>"
-                        placeholder="<?php echo lang('amt_or_p'); ?>" />
-                </div>
-                <div class="section4 fix"><?php echo lang('total'); ?>&nbsp;&nbsp;&nbsp;
-                    <span id="modal_total_price">0</span>
-                </div>
-            </div>
-            <div class="section6 fix">
-                <div class="section5" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-                    <span><?php echo lang('label_to_preparation'); ?>:</span>
-                    <button type="button" id="btn_toggle_customer_note_box" style="background-color: #17a2b8; color: #fff; border: none; border-radius: 4px; padding: 4px 10px; font-size: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; font-weight: bold;">
-                        <i class="fas fa-user-edit"></i> Customer Info & Address <i class="fas fa-chevron-down" id="customer_note_chevron"></i>
-                    </button>
-                </div>
-                
-                <!-- Expandable Customer Info Panel inside Item Modal -->
-                <div id="item_modal_customer_expand_box" style="display: none; background: #f8f9fa; border: 1px solid #ced4da; border-radius: 6px; padding: 10px; margin-bottom: 10px;">
-                    <div style="display: flex; gap: 8px; margin-bottom: 6px; position: relative;">
-                        <div style="flex: 1; position: relative;">
-                            <input type="text" id="item_modal_cust_phone" placeholder="Phone Number (Type to search...)" style="width: 100%; padding: 6px 10px; border: 1px solid #ced4da; border-radius: 4px; font-size: 13px; box-sizing: border-box;" autocomplete="off">
-                            <div id="item_modal_phone_suggestions" style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid #007bff; border-radius: 4px; max-height: 140px; overflow-y: auto; z-index: 9999; box-shadow: 0 4px 8px rgba(0,0,0,0.15);"></div>
+            <div class="item_modal_body_flex">
+                <!-- Left Column: Item details, options, modifiers, note & customer info -->
+                <div class="item_modal_left_col">
+                    <div class="ir_mrx5">
+                        <p class="prom_txt"></p>
+                        <div class="section2 fix display_none_new variation_div_modal">
+                            <div class="sec2_inside" id="sec2_1"><?php echo lang('Variation'); ?></div>
+                            <div class="sec2_inside" id="sec2_2"> <span id="vr01_modal_price_variable">0</span>
+                                <span id="vr01_modal_unit_price_variable" class="ir_display_none">0</span>
+                            </div>
                         </div>
-                        <div style="flex: 1;">
-                            <input type="text" id="item_modal_cust_name" placeholder="Customer Name" style="width: 100%; padding: 6px 10px; border: 1px solid #ced4da; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
+                        <div class="section3 section3_vr fix display_none_new variation_div_modal">
+                        </div>
+
+                        <div class="section1 fix v_h_middle">
+                            <div class="sec1_inside" id="sec1_1"><?php echo lang('quantity'); ?></div>
+                            <div class="sec1_inside" id="sec1_2"><i class="fal fa-minus" id="decrease_item_modal"></i>
+                                <input onfocus="select();" type="text" id="item_quantity_modal" value="1"> <i
+                                    class="fal fa-plus" id="increase_item_modal"></i>
+                            </div>
+                            <div class="sec1_inside" id="sec1_3"> <span id="modal_item_price_variable"
+                                    class="ir_display_none">0</span><span
+                                    id="modal_item_price_variable_without_discount">0</span><span id="modal_discount_amount"
+                                    class="ir_display_none">0</span></div>
+
+                        </div>
+
+                        <div class="modifier_div section2 fix">
+                            <div class="sec2_inside" id="sec2_1"><?php echo lang('modifiers'); ?></div>
+                            <div class="sec2_inside" id="sec2_2"> <span id="modal_modifier_price_variable">0</span>
+                                <span id="modal_modifiers_unit_price_variable" class="ir_display_none">0</span>
+                            </div>
+                        </div>
+
+                        <div class="section3 section3_new">
+
+                        </div>
+
+                        <div id="modal_discount_section">
+                            <p class="ir_fl_m_font_16" id="discount_txt_focus"><?php echo lang('discount'); ?> <i
+                                    data-tippy-content="<?php echo lang('txt_err_pos_6'); ?>"
+                                    class="fal fa-question-circle tooltip_modifier"></i></p><input type="text" name=""
+                                onfocus="select();" <?php echo isset($waiter_app_status) && $waiter_app_status == "Yes" ? "readonly" : '' ?> id="modal_discount"
+                                class="<?php echo isset($is_discount) && $is_discount == "Yes" ? "numpad_input_" : '' ?>"
+                                placeholder="<?php echo lang('amt_or_p'); ?>" />
+                        </div>
+                        <div class="section4 fix"><?php echo lang('total'); ?>&nbsp;&nbsp;&nbsp;
+                            <span id="modal_total_price">0</span>
                         </div>
                     </div>
-                    <div style="margin-bottom: 8px;">
-                        <input type="text" id="item_modal_cust_address" placeholder="Delivery Address / Landmark" style="width: 100%; padding: 6px 10px; border: 1px solid #ced4da; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
-                    </div>
-                    <div style="display: flex; justify-content: flex-end;">
-                        <button type="button" id="btn_apply_cust_to_order" style="background-color: #007bff; color: #fff; border: none; border-radius: 4px; padding: 6px 15px; font-size: 13px; cursor: pointer; font-weight: bold;">
-                            <i class="fas fa-check-circle"></i> Set as Order Customer
-                        </button>
+                    <div class="section6 fix">
+                        <div class="section5" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                            <span><?php echo lang('label_to_preparation'); ?>:</span>
+                            <button type="button" id="btn_toggle_customer_note_box" style="background-color: #17a2b8; color: #fff; border: none; border-radius: 4px; padding: 4px 10px; font-size: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; font-weight: bold;">
+                                <i class="fas fa-user-edit"></i> Customer Info & Address <i class="fas fa-chevron-down" id="customer_note_chevron"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- Expandable Customer Info Panel inside Item Modal -->
+                        <div id="item_modal_customer_expand_box" style="display: none; background: #f8f9fa; border: 1px solid #ced4da; border-radius: 6px; padding: 10px; margin-bottom: 10px;">
+                            <div style="display: flex; gap: 8px; margin-bottom: 6px; position: relative;">
+                                <div style="flex: 1; position: relative;">
+                                    <input type="text" id="item_modal_cust_phone" placeholder="Phone Number (Type to search...)" style="width: 100%; padding: 6px 10px; border: 1px solid #ced4da; border-radius: 4px; font-size: 13px; box-sizing: border-box;" autocomplete="off">
+                                    <div id="item_modal_phone_suggestions" style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid #007bff; border-radius: 4px; max-height: 140px; overflow-y: auto; z-index: 9999; box-shadow: 0 4px 8px rgba(0,0,0,0.15);"></div>
+                                </div>
+                                <div style="flex: 1;">
+                                    <input type="text" id="item_modal_cust_name" placeholder="Customer Name" style="width: 100%; padding: 6px 10px; border: 1px solid #ced4da; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
+                                </div>
+                            </div>
+                            <div style="margin-bottom: 8px;">
+                                <input type="text" id="item_modal_cust_address" placeholder="Delivery Address / Landmark" style="width: 100%; padding: 6px 10px; border: 1px solid #ced4da; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
+                            </div>
+                            <div style="display: flex; justify-content: flex-end;">
+                                <button type="button" id="btn_apply_cust_to_order" style="background-color: #007bff; color: #fff; border: none; border-radius: 4px; padding: 6px 15px; font-size: 13px; cursor: pointer; font-weight: bold;">
+                                    <i class="fas fa-check-circle"></i> Set as Order Customer
+                                </button>
+                            </div>
+                        </div>
+
+                        <textarea name="item_note" id="modal_item_note" maxlength="150" placeholder="Type special instructions / preparation note..."></textarea>
                     </div>
                 </div>
 
-                <textarea name="item_note" id="modal_item_note" maxlength="150"></textarea>
+                <!-- Right Column: Touch Keyboard (Dual QWERTY / Numeric) -->
+                <div class="item_modal_right_col">
+                    <div class="item_modal_keyboard_wrapper">
+                        <div class="item_keyboard_header">
+                            <div class="keyboard_mode_switch item_kb_mode_switch">
+                                <button type="button" class="btn_item_kb_switch active" data-mode="qwerty">ABC</button>
+                                <button type="button" class="btn_item_kb_switch" data-mode="num">123</button>
+                            </div>
+                            <span class="item_keyboard_target_badge" id="item_keyboard_target_badge">Note</span>
+                        </div>
 
-                <!-- Item Modal Touch Keyboard (Dual QWERTY / Numeric) -->
-                <div class="item_modal_keyboard_wrapper">
-                    <div class="item_keyboard_header">
-                        <div class="keyboard_mode_switch item_kb_mode_switch">
-                            <button type="button" class="btn_item_kb_switch active" data-mode="qwerty">ABC</button>
-                            <button type="button" class="btn_item_kb_switch" data-mode="num">123</button>
+                        <div class="item_numpad_quick_fields">
+                            <button type="button" class="btn_item_quick_field active" data-target="modal_item_note"><i class="fas fa-comment-alt"></i> Note</button>
+                            <button type="button" class="btn_item_quick_field" data-target="item_quantity_modal"><i class="fas fa-calculator"></i> Qty</button>
+                            <button type="button" class="btn_item_quick_field" data-target="modal_discount"><i class="fas fa-percent"></i> Discount</button>
                         </div>
-                        <span class="item_keyboard_target_badge" id="item_keyboard_target_badge">Note</span>
-                    </div>
 
-                    <!-- QWERTY Layout for Item Modal -->
-                    <div class="item_keyboard_layout item_qwerty_layout">
-                        <div class="qwerty_row qwerty_row_1">
-                            <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="q">Q</button>
-                            <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="w">W</button>
-                            <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="e">E</button>
-                            <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="r">R</button>
-                            <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="t">T</button>
-                            <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="y">Y</button>
-                            <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="u">U</button>
-                            <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="i">I</button>
-                            <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="o">O</button>
-                            <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="p">P</button>
+                        <!-- QWERTY Layout for Item Modal -->
+                        <div class="item_keyboard_layout item_qwerty_layout">
+                            <div class="qwerty_row qwerty_row_1">
+                                <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="q">Q</button>
+                                <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="w">W</button>
+                                <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="e">E</button>
+                                <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="r">R</button>
+                                <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="t">T</button>
+                                <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="y">Y</button>
+                                <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="u">U</button>
+                                <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="i">I</button>
+                                <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="o">O</button>
+                                <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="p">P</button>
+                            </div>
+                            <div class="qwerty_row qwerty_row_2">
+                                <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="a">A</button>
+                                <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="s">S</button>
+                                <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="d">D</button>
+                                <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="f">F</button>
+                                <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="g">G</button>
+                                <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="h">H</button>
+                                <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="j">J</button>
+                                <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="k">K</button>
+                                <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="l">L</button>
+                            </div>
+                            <div class="qwerty_row qwerty_row_3">
+                                <button type="button" class="btn_cust_key btn_item_key btn_item_shift active" data-action="shift" title="Shift / Caps"><i class="fas fa-arrow-up"></i></button>
+                                <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="z">Z</button>
+                                <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="x">X</button>
+                                <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="c">C</button>
+                                <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="v">V</button>
+                                <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="b">B</button>
+                                <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="n">N</button>
+                                <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="m">M</button>
+                                <button type="button" class="btn_cust_key btn_item_key btn_cust_backspace" data-action="backspace" title="Backspace"><i class="fas fa-backspace"></i></button>
+                            </div>
+                            <div class="qwerty_row qwerty_row_4">
+                                <button type="button" class="btn_cust_key btn_item_key btn_item_switch_num" data-action="switch_num">123</button>
+                                <button type="button" class="btn_cust_key btn_item_key btn_symbol_key" data-val=",">,</button>
+                                <button type="button" class="btn_cust_key btn_item_key btn_cust_space" data-action="space">Space</button>
+                                <button type="button" class="btn_cust_key btn_item_key btn_symbol_key" data-val=".">.</button>
+                                <button type="button" class="btn_cust_key btn_item_key btn_cust_clear" data-action="clear">C</button>
+                            </div>
                         </div>
-                        <div class="qwerty_row qwerty_row_2">
-                            <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="a">A</button>
-                            <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="s">S</button>
-                            <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="d">D</button>
-                            <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="f">F</button>
-                            <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="g">G</button>
-                            <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="h">H</button>
-                            <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="j">J</button>
-                            <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="k">K</button>
-                            <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="l">L</button>
-                        </div>
-                        <div class="qwerty_row qwerty_row_3">
-                            <button type="button" class="btn_cust_key btn_item_key btn_item_shift active" data-action="shift" title="Shift / Caps"><i class="fas fa-arrow-up"></i></button>
-                            <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="z">Z</button>
-                            <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="x">X</button>
-                            <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="c">C</button>
-                            <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="v">V</button>
-                            <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="b">B</button>
-                            <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="n">N</button>
-                            <button type="button" class="btn_cust_key btn_item_key btn_alpha_key" data-char="m">M</button>
-                            <button type="button" class="btn_cust_key btn_item_key btn_cust_backspace" data-action="backspace" title="Backspace"><i class="fas fa-backspace"></i></button>
-                        </div>
-                        <div class="qwerty_row qwerty_row_4">
-                            <button type="button" class="btn_cust_key btn_item_key btn_item_switch_num" data-action="switch_num">123</button>
-                            <button type="button" class="btn_cust_key btn_item_key btn_symbol_key" data-val=",">,</button>
-                            <button type="button" class="btn_cust_key btn_item_key btn_cust_space" data-action="space">Space</button>
-                            <button type="button" class="btn_cust_key btn_item_key btn_symbol_key" data-val=".">.</button>
-                            <button type="button" class="btn_cust_key btn_item_key btn_cust_clear" data-action="clear">C</button>
-                        </div>
-                    </div>
 
-                    <!-- Numeric Layout for Item Modal -->
-                    <div class="item_keyboard_layout item_numeric_layout" style="display: none;">
-                        <div class="qwerty_row item_num_row_1">
-                            <button type="button" class="btn_cust_key btn_item_key btn_num_key" data-val="1">1</button>
-                            <button type="button" class="btn_cust_key btn_item_key btn_num_key" data-val="2">2</button>
-                            <button type="button" class="btn_cust_key btn_item_key btn_num_key" data-val="3">3</button>
-                            <button type="button" class="btn_cust_key btn_item_key btn_num_key" data-val="4">4</button>
-                            <button type="button" class="btn_cust_key btn_item_key btn_num_key" data-val="5">5</button>
-                            <button type="button" class="btn_cust_key btn_item_key btn_num_key" data-val="6">6</button>
-                            <button type="button" class="btn_cust_key btn_item_key btn_num_key" data-val="7">7</button>
-                            <button type="button" class="btn_cust_key btn_item_key btn_num_key" data-val="8">8</button>
-                            <button type="button" class="btn_cust_key btn_item_key btn_num_key" data-val="9">9</button>
-                            <button type="button" class="btn_cust_key btn_item_key btn_num_key" data-val="0">0</button>
-                        </div>
-                        <div class="qwerty_row item_num_row_2">
-                            <button type="button" class="btn_cust_key btn_item_key btn_item_switch_alpha" data-action="switch_alpha">ABC</button>
-                            <button type="button" class="btn_cust_key btn_item_key btn_symbol_key" data-val="-">-</button>
-                            <button type="button" class="btn_cust_key btn_item_key btn_symbol_key" data-val="+">+</button>
-                            <button type="button" class="btn_cust_key btn_item_key btn_symbol_key" data-val="%">%</button>
-                            <button type="button" class="btn_cust_key btn_item_key btn_cust_space" data-action="space">Space</button>
-                            <button type="button" class="btn_cust_key btn_item_key btn_symbol_key" data-val=".">.</button>
-                            <button type="button" class="btn_cust_key btn_item_key btn_cust_backspace" data-action="backspace" title="Backspace"><i class="fas fa-backspace"></i></button>
-                            <button type="button" class="btn_cust_key btn_item_key btn_cust_clear" data-action="clear">C</button>
+                        <!-- Modern Numpad Layout for Item Modal (4x4 Grid + ABC / Space) -->
+                        <div class="item_keyboard_layout item_numeric_layout" style="display: none;">
+                            <div class="item_numpad_grid">
+                                <button type="button" class="btn_cust_key btn_item_key btn_num_key" data-val="1">1</button>
+                                <button type="button" class="btn_cust_key btn_item_key btn_num_key" data-val="2">2</button>
+                                <button type="button" class="btn_cust_key btn_item_key btn_num_key" data-val="3">3</button>
+                                <button type="button" class="btn_cust_key btn_item_key btn_cust_func" data-val="+">+</button>
+
+                                <button type="button" class="btn_cust_key btn_item_key btn_num_key" data-val="4">4</button>
+                                <button type="button" class="btn_cust_key btn_item_key btn_num_key" data-val="5">5</button>
+                                <button type="button" class="btn_cust_key btn_item_key btn_num_key" data-val="6">6</button>
+                                <button type="button" class="btn_cust_key btn_item_key btn_cust_func" data-val="-">-</button>
+
+                                <button type="button" class="btn_cust_key btn_item_key btn_num_key" data-val="7">7</button>
+                                <button type="button" class="btn_cust_key btn_item_key btn_num_key" data-val="8">8</button>
+                                <button type="button" class="btn_cust_key btn_item_key btn_num_key" data-val="9">9</button>
+                                <button type="button" class="btn_cust_key btn_item_key btn_cust_func" data-val="%">%</button>
+
+                                <button type="button" class="btn_cust_key btn_item_key btn_cust_func" data-val=".">.</button>
+                                <button type="button" class="btn_cust_key btn_item_key btn_num_key" data-val="0">0</button>
+                                <button type="button" class="btn_cust_key btn_item_key btn_cust_backspace" data-action="backspace" title="Backspace"><i class="fas fa-backspace"></i></button>
+                                <button type="button" class="btn_cust_key btn_item_key btn_cust_clear" data-action="clear">C</button>
+                            </div>
+                            <div class="item_numpad_bottom_row">
+                                <button type="button" class="btn_cust_key btn_item_key btn_item_switch_alpha" data-action="switch_alpha">ABC</button>
+                                <button type="button" class="btn_cust_key btn_item_key btn_cust_space" data-action="space">Space</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -3401,14 +3417,16 @@ if ($wl) {
                                     <input type="text" placeholder="<?php echo lang('name'); ?>"
                                         class="add_customer_modal_input" id="customer_name_modal" required>
                                 </div>
-                                <div class="customer_section">
+                                <div class="customer_section" style="position: relative;">
                                     <p class="input_level">
                                         <?php echo lang('phone'); ?>
                                         <small>(<?php echo lang('should_have_country_code'); ?>)</small>
                                     </p>
 
                                     <input type="text" class="add_customer_modal_input"
-                                        placeholder="<?php echo lang('phone'); ?>" id="customer_phone_modal">
+                                        placeholder="<?php echo lang('phone'); ?>" id="customer_phone_modal" autocomplete="off">
+                                    <div id="customer_phone_search_status" style="display: none; font-size: 12px; margin-top: 4px; font-weight: 600;"></div>
+                                    <div id="customer_phone_search_dropdown" style="display: none; position: absolute; left: 0; right: 0; top: 100%; z-index: 999; background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; box-shadow: 0 6px 18px rgba(0,0,0,0.15); max-height: 180px; overflow-y: auto; margin-top: 3px;"></div>
                                 </div>
                                 <div class="customer_section">
                                     <p class="input_level"><?php echo lang('email'); ?></p>

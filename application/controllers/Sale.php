@@ -1049,7 +1049,7 @@ class Sale extends Cl_Controller {
      * @return json
      */
     public function search_customer_by_phone_ajax() {
-        $term = trim_checker($this->input->post('search_term'));
+        $term = trim_checker($this->input->post('phone') ? $this->input->post('phone') : $this->input->post('search_term'));
         $company_id = $this->session->userdata('company_id');
 
         if (!$term || strlen($term) < 2) {
@@ -1057,14 +1057,19 @@ class Sale extends Cl_Controller {
             return;
         }
 
-        $this->db->select("c.id, c.name, c.phone, c.address, c.email, ca.address as latest_delivery_address");
+        $this->db->select("c.id, c.name, c.phone, c.address, c.email, c.date_of_birth, c.date_of_anniversary, c.default_discount, c.gst_number, c.same_or_diff_state, ca.address as latest_delivery_address");
         $this->db->from('tbl_customers c');
         $this->db->join('tbl_customer_address ca', 'ca.customer_id = c.id AND ca.is_active = 1', 'left');
         $this->db->where('c.del_status', 'Live');
         if ($company_id) {
             $this->db->where('c.company_id', $company_id);
         }
-        $this->db->where("(c.phone LIKE '%" . $this->db->escape_like_str($term) . "%' OR c.name LIKE '%" . $this->db->escape_like_str($term) . "%')");
+        $clean_term = preg_replace('/[^0-9]/', '', $term);
+        if ($clean_term && strlen($clean_term) >= 3) {
+            $this->db->where("(c.phone LIKE '%" . $this->db->escape_like_str($term) . "%' OR c.phone LIKE '%" . $this->db->escape_like_str($clean_term) . "%' OR c.name LIKE '%" . $this->db->escape_like_str($term) . "%')");
+        } else {
+            $this->db->where("(c.phone LIKE '%" . $this->db->escape_like_str($term) . "%' OR c.name LIKE '%" . $this->db->escape_like_str($term) . "%')");
+        }
         $this->db->where("c.name !=", "Walk-in Customer");
         $this->db->order_by('c.id', 'DESC');
         $this->db->limit(10);
@@ -1079,7 +1084,12 @@ class Sale extends Cl_Controller {
                     'name' => $row->name,
                     'phone' => $row->phone,
                     'address' => $effective_address ? $effective_address : '',
-                    'email' => $row->email ? $row->email : ''
+                    'email' => $row->email ? $row->email : '',
+                    'date_of_birth' => ($row->date_of_birth && $row->date_of_birth != '0000-00-00') ? $row->date_of_birth : '',
+                    'date_of_anniversary' => ($row->date_of_anniversary && $row->date_of_anniversary != '0000-00-00') ? $row->date_of_anniversary : '',
+                    'default_discount' => $row->default_discount ? $row->default_discount : '',
+                    'gst_number' => $row->gst_number ? $row->gst_number : '',
+                    'same_or_diff_state' => $row->same_or_diff_state ? $row->same_or_diff_state : ''
                 );
             }
         }
@@ -1834,6 +1844,13 @@ class Sale extends Cl_Controller {
         $order = $this->input->post('order');
         $reason = $this->input->post('reason');
         $order_details = (json_decode($order));
+
+        if(isset($order_details->sale_no) && $order_details->sale_no){
+            $this->db->where('sale_no', $order_details->sale_no);
+            $this->db->update('tbl_sales', array('order_status' => 3, 'close_time' => date('H:i:s')));
+            $this->db->delete('tbl_running_order_tables', array('sale_no' => $order_details->sale_no));
+            $this->db->delete('tbl_orders_table', array('sale_no' => $order_details->sale_no));
+        }
 
         $select_kitchen_row = getKitchenSaleDetailsBySaleNo($order_details->sale_no);
         if($select_kitchen_row){

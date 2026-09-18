@@ -7257,27 +7257,86 @@
         }
     }
 
-    function cancel_order_by_click(sale_id, reason) {
+    function cancel_order_by_click(sale_id, reason, sale_no) {
+        let clean_target_id = sale_id;
+        if (typeof sale_id === "string" && sale_id.startsWith("srv_")) {
+            clean_target_id = parseInt(sale_id.substr(4));
+        } else if (typeof sale_id === "string" && !isNaN(sale_id)) {
+            clean_target_id = Number(sale_id);
+        }
+
+        if (sale_id) recentlyClosedSaleNos.add(String(sale_id));
+        if (clean_target_id) {
+            recentlyClosedSaleNos.add(String(clean_target_id));
+            recentlyClosedSaleNos.add("srv_" + clean_target_id);
+        }
+        if (sale_no) {
+            recentlyClosedSaleNos.add(String(sale_no).trim());
+        }
+
+        let auditLogged = false;
         let objectStore = db.transaction(['sales'], "readwrite").objectStore("sales");
         objectStore.openCursor().onsuccess = function (event) {
             let cursor = event.target.result;
             if (cursor) {
-                if (cursor.value.sales_id == sale_id) {
+                let cur_id = cursor.value.sales_id || cursor.value.sale_id;
+                let clean_cur_id = (typeof cur_id === "string" && cur_id.startsWith("srv_")) ? parseInt(cur_id.substr(4)) : Number(cur_id);
+                let cur_sale_no = cursor.value.sale_no;
+                try {
+                    let parsed = JSON.parse(cursor.value.order || "{}");
+                    if (parsed.sale_no) cur_sale_no = parsed.sale_no;
+                } catch (e) { }
+
+                if (cur_id == sale_id || (clean_target_id && clean_cur_id === clean_target_id) || (sale_no && cur_sale_no == sale_no)) {
                     let orderData = cursor.value;
                     let orderInfo = orderData.order;
-                    let delReq = cursor.delete();
-                    delReq.onsuccess = function (event) {
-                        //update log
-                        put_audit_log_report_for_cancel_order(orderInfo, reason);
-                        $("#order_" + sale_id).remove();
-                        toastr['success']((cancel_order_msg), '');
-                    };
+                    put_audit_log_report_for_cancel_order(orderInfo, reason);
+                    auditLogged = true;
+                    if (cur_sale_no) recentlyClosedSaleNos.add(cur_sale_no);
+                    cursor.delete();
                 }
 
                 cursor.continue();
             }
+        };
+
+        // Fallback audit log & backend cancel if not triggered in cursor
+        setTimeout(function() {
+            if (!auditLogged && sale_no) {
+                put_audit_log_report_for_cancel_order(JSON.stringify({ sale_no: sale_no }), reason);
+            }
+        }, 100);
+
+        if (sale_no) {
+            $.ajax({
+                url: base_url + "Authentication/setPickupClose",
+                method: "post",
+                dataType: 'json',
+                data: {
+                    sale_no: sale_no,
+                    csrf_irestoraplus: csrf_value_,
+                },
+                success: function () { },
+                error: function () { },
+            });
         }
+
+        removeOrderFromDom(sale_id, sale_no || '');
+        if (clean_target_id && clean_target_id !== sale_id) {
+            removeOrderFromDom(clean_target_id, sale_no || '');
+        }
+        $("#order_" + sale_id).remove();
+        $("#order_srv_" + sale_id).remove();
+        if (clean_target_id) {
+            $("#order_" + clean_target_id).remove();
+            $("#order_srv_" + clean_target_id).remove();
+        }
+        toastr['success']((cancel_order_msg), '');
+
         removeOrderTablesBySaleId(sale_id, '');
+        if (clean_target_id) removeOrderTablesBySaleId(clean_target_id, '');
+        clearFooterCartCalculation();
+        loadAllTableStates();
         displayOrderList();
 
         $(".order_table_holder .order_holder").empty();
@@ -7286,8 +7345,11 @@
             "data-table-checked",
             "unchecked"
         );
-
+        if (waiter_app_status != "Yes") {
+            $("#select_waiter").val("");
+        }
         $("#select_walk_in_customer").val("1");
+        reset_time_interval();
         all_time_interval_operation();
     }
     function close_order_by_click(sale_id) {
@@ -7421,6 +7483,8 @@
         if (pos_2) {
             if ($(".holder .order_details .single_order[data-selected=selected]").length > 0) {
                 let selected_order = $(".holder .order_details .single_order[data-selected=selected]");
+                let sale_id = selected_order.attr("id").substr(6);
+                let sale_no = selected_order.find(".running_order_order_number").text().trim();
                 let selected_order_started_cooking_items = selected_order.attr(
                     "data-started-cooking"
                 );
@@ -7430,47 +7494,78 @@
                 if (selected_order_started_cooking_items > 0 || selected_order_done_cooking_items > 0) {
                     toastr['error']((order_in_progress_or_done), '');
                 } else {
+                    let cancelReasonHtml = `
+                        <div style="text-align: left; margin-top: 10px;">
+                            <p style="font-size: 14px; color: #555; margin-bottom: 8px;">Select reason for cancelling the order:</p>
+                            <select id="cancel_order_reason_select" style="width: 100%; height: 42px; border-radius: 6px; border: 1px solid #ccd0d5; padding: 6px 12px; font-size: 14px; background: #fff; color: #333; outline: none; cursor: pointer; box-sizing: border-box;">
+                                <option value="">-- Select Reason --</option>
+                                <option value="Customer Changed Mind">Customer Changed Mind</option>
+                                <option value="Customer Left / Walked Out">Customer Left / Walked Out</option>
+                                <option value="Wrong Item / Mistake">Wrong Item / Mistake</option>
+                                <option value="Item Out of Stock">Item Out of Stock</option>
+                                <option value="Delayed Order / Long Wait">Delayed Order / Long Wait</option>
+                                <option value="Duplicate Order">Duplicate Order</option>
+                                <option value="Test / Training Order">Test / Training Order</option>
+                                <option value="Other">Other (Type Reason)</option>
+                            </select>
+                            <input type="text" id="cancel_order_reason_custom" placeholder="Type specific reason here..." style="display: none; width: 100%; height: 40px; border-radius: 6px; border: 1px solid #ccd0d5; padding: 6px 12px; font-size: 14px; margin-top: 10px; box-sizing: border-box; outline: none;" />
+                            <div id="cancel_reason_error_msg" style="display: none; color: #e74c3c; font-size: 13px; margin-top: 8px; font-weight: 500;">Please select or enter a cancellation reason!</div>
+                        </div>
+                    `;
+
                     swal({
                         title: warning + "!",
-                        text: "Write your reason for cancelling the order!",
-                        type: "input",
+                        text: cancelReasonHtml,
+                        html: true,
                         showCancelButton: true,
                         closeOnConfirm: false,
                         animation: "slide-from-top",
-                        inputPlaceholder: "Write reason"
+                        confirmButtonText: "OK",
+                        cancelButtonText: "Cancel"
                     },
-                        function (inputValue) {
-                            if (inputValue === false) return false;
-                            if (inputValue === "") {
-                                swal.showInputError("Please enter your reason!");
-                                return false
+                        function (isConfirm) {
+                            if (isConfirm === false) return false;
+
+                            let selectedVal = $("#cancel_order_reason_select").val();
+                            let finalReason = selectedVal;
+                            if (selectedVal === "Other") {
+                                finalReason = $("#cancel_order_reason_custom").val().trim();
+                            }
+
+                            if (!finalReason) {
+                                $("#cancel_reason_error_msg").show();
+                                return false;
+                            }
+
+                            if (typeof swal.close === "function") {
+                                swal.close();
                             } else {
                                 $(".sa-button-container").find('.cancel').click();
+                            }
 
-                                let sale_id = $(".holder .order_details .single_order[data-selected=selected]").attr("id").substr(6);
-                                let sale_no = $(".holder .order_details .single_order[data-selected=selected]").find(".running_order_order_number").text();
-                                if (checkInternetConnection()) {
-                                    $.ajax({
-                                        url: base_url + "Kitchen/check_update_kitchen_status_ajax",
-                                        method: "post",
-                                        dataType: "json",
-                                        data: { sale_no: sale_no },
-                                        success: function (data) {
-                                            if (data.status == false) {
-                                                cancel_order_by_click(sale_id, inputValue);
-                                            } else if (data.is_done == true) {
-                                                toastr['error']((this_item_is_under_cooking_please_contact_with_admin), '');
-                                                return false;
-                                            } else if (data.is_cooked == true) {
-                                                toastr['error']((this_item_already_cooked_please_contact_with_admin), '');
-                                                return false;
-                                            }
-                                        },
-                                        error: function () { },
-                                    });
-                                } else {
-                                    cancel_order_by_click(sale_id, inputValue);
-                                }
+                            if (checkInternetConnection()) {
+                                $.ajax({
+                                    url: base_url + "Kitchen/check_update_kitchen_status_ajax",
+                                    method: "post",
+                                    dataType: "json",
+                                    data: { sale_no: sale_no },
+                                    success: function (data) {
+                                        if (data.status == false) {
+                                            cancel_order_by_click(sale_id, finalReason, sale_no);
+                                        } else if (data.is_done == true) {
+                                            toastr['error']((this_item_is_under_cooking_please_contact_with_admin), '');
+                                            return false;
+                                        } else if (data.is_cooked == true) {
+                                            toastr['error']((this_item_already_cooked_please_contact_with_admin), '');
+                                            return false;
+                                        }
+                                    },
+                                    error: function () {
+                                        cancel_order_by_click(sale_id, finalReason, sale_no);
+                                    },
+                                });
+                            } else {
+                                cancel_order_by_click(sale_id, finalReason, sale_no);
                             }
                         });
                 }
@@ -7482,6 +7577,31 @@
             toastr['error']((menu_not_permit_access + "!"), '');
         }
 
+    });
+
+    $(document).on("change", "#cancel_order_reason_select", function () {
+        let val = $(this).val();
+        if (val === "Other") {
+            $("#cancel_order_reason_custom").show().focus();
+        } else {
+            $("#cancel_order_reason_custom").hide();
+        }
+        if (val !== "") {
+            $("#cancel_reason_error_msg").hide();
+        }
+    });
+
+    $(document).on("input keyup", "#cancel_order_reason_custom", function () {
+        if ($(this).val().trim() !== "") {
+            $("#cancel_reason_error_msg").hide();
+        }
+    });
+
+    $(document).on("keydown keypress keyup", "#cancel_order_reason_select, #cancel_order_reason_custom", function (e) {
+        e.stopPropagation();
+        if (e.which === 13) {
+            $(".sweet-alert button.confirm").click();
+        }
     });
     $(document).on("click", "#close_order_button", function (e) {
         let pos_2 = Number($("#pos_2").val());
@@ -7865,6 +7985,9 @@
         }
         $("#item_keyboard_target_badge").text(label);
 
+        $(".btn_item_quick_field").removeClass("active");
+        $(".btn_item_quick_field[data-target='" + id + "']").addClass("active");
+
         // Auto-switch keyboard layout based on input field
         if (id === "modal_discount" || id === "item_quantity_modal" || id === "item_modal_cust_phone") {
             setItemKeyboardMode("num");
@@ -7872,6 +7995,17 @@
             setItemKeyboardMode("qwerty");
         }
     }
+
+    // Quick field buttons inside Item Modal keyboard header
+    $(document).on("click", ".btn_item_quick_field", function (e) {
+        e.preventDefault();
+        let targetId = $(this).attr("data-target");
+        let $target = $("#" + targetId);
+        if ($target.length) {
+            $target.focus();
+            setItemInputTarget($target);
+        }
+    });
 
     // Switch mode buttons in Item Modal (ABC / 123)
     $(document).on("click", ".btn_item_kb_switch", function (e) {
@@ -13822,6 +13956,11 @@
         $("#customer_delivery_address_modal").val("");
         $("#customer_gst_number_modal").val("");
         $(".same_or_diff_state_modal").val("0").change();
+        $("#customer_default_discount_modal").val("");
+        $("#customer_phone_search_status").hide().empty();
+        $("#customer_phone_search_dropdown").hide().empty();
+        $(".added_address").html("");
+        $("#is_new_address").val("Yes");
     }
 
     function clearFooterCartCalculation() {
@@ -17356,6 +17495,118 @@
             },
         });
     }
+
+    let customer_phone_search_timer = null;
+
+    function escapeHtmlCust(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    $(document).on("input keyup", "#customer_phone_modal", function () {
+        let phone_val = $(this).val().trim();
+        clearTimeout(customer_phone_search_timer);
+
+        let digits = phone_val.replace(/[^0-9]/g, '');
+        if (digits.length < 3) {
+            $("#customer_phone_search_status").hide().empty();
+            $("#customer_phone_search_dropdown").hide().empty();
+            if (phone_val.length === 0) {
+                $("#customer_id_modal").val("");
+            }
+            return;
+        }
+
+        $("#customer_phone_search_status").show().html(
+            '<span style="color: #64748b; font-size: 11px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">' +
+            '<i class="fas fa-spinner fa-spin"></i> Searching customer...</span>'
+        );
+
+        customer_phone_search_timer = setTimeout(function () {
+            $.ajax({
+                url: base_url + "Sale/search_customer_by_phone_ajax",
+                method: "POST",
+                data: {
+                    phone: phone_val,
+                    csrf_irestoraplus: typeof csrf_value_ !== "undefined" ? csrf_value_ : '',
+                },
+                dataType: "json",
+                success: function (data) {
+                    if (!data || data.length === 0) {
+                        $("#customer_phone_search_status").show().html(
+                            '<span style="color: #64748b; font-size: 11px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">' +
+                            '<i class="fas fa-user-plus"></i> New customer (Not registered)</span>'
+                        );
+                        $("#customer_id_modal").val("");
+                        $("#customer_phone_search_dropdown").hide().empty();
+                        return;
+                    }
+
+                    window._cust_phone_search_results = data;
+
+                    // Do not auto-fill automatically on typing. Always show the matching results in the dropdown.
+                    // Only fill when the user clicks the match.
+                    let dropHtml = '';
+                    for (let j = 0; j < data.length; j++) {
+                        let cust = data[j];
+                        dropHtml +=
+                            '<div class="cust_search_match_item" data-id="' + cust.id + '">' +
+                                '<div>' +
+                                    '<div style="font-weight: 700; color: #1e293b; font-size: 13px;">' + escapeHtmlCust(cust.name) + '</div>' +
+                                    '<div style="font-size: 11px; color: #64748b;">' + (cust.address ? escapeHtmlCust(cust.address) : 'No address') + '</div>' +
+                                '</div>' +
+                                '<div style="display: flex; align-items: center; gap: 8px;">' +
+                                    '<span style="background: #e0f2fe; color: #0369a1; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; white-space: nowrap;">' + escapeHtmlCust(cust.phone) + '</span>' +
+                                    '<span class="cust_search_fill_badge"><i class="fas fa-check"></i> Fill</span>' +
+                                '</div>' +
+                            '</div>';
+                    }
+
+                    $("#customer_phone_search_dropdown").html(dropHtml).show();
+                    $("#customer_phone_search_status").show().html(
+                        '<span style="color: #0284c7; font-size: 11px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">' +
+                        '<i class="fas fa-search"></i> ' + data.length + ' matching customer(s) found. Click below to load:</span>'
+                    );
+                },
+                error: function () {
+                    $("#customer_phone_search_status").hide().empty();
+                    $("#customer_phone_search_dropdown").hide().empty();
+                }
+            });
+        }, 250);
+    });
+
+    $(document).on("click", ".cust_search_match_item", function (e) {
+        e.stopPropagation();
+        let cid = $(this).attr("data-id");
+        if (window._cust_phone_search_results) {
+            let found = window._cust_phone_search_results.find(function (item) {
+                return item.id == cid;
+            });
+            if (found) {
+                get_customer_for_edit(found.id);
+                $("#customer_phone_search_status").show().html(
+                    '<span style="color: #16a34a; font-size: 11px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">' +
+                    '<i class="fas fa-check-circle"></i> Selected: <b>' + escapeHtmlCust(found.name) + '</b> (Details filled)</span>'
+                );
+                $("#customer_phone_search_dropdown").hide().empty();
+                return;
+            }
+        }
+        get_customer_for_edit(cid);
+        $("#customer_phone_search_dropdown").hide().empty();
+    });
+
+    $(document).on("click", function (e) {
+        if (!$(e.target).closest("#customer_phone_modal, #customer_phone_search_dropdown").length) {
+            $("#customer_phone_search_dropdown").hide();
+        }
+    });
 
     function callValidationAjax() {
         $.ajax({
